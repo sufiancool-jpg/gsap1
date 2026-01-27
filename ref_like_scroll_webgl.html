@@ -1,280 +1,208 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sideways Scroll – WebGL Reference</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Urbanoise – Typographic Sphere (Surface)</title>
 
 <style>
 :root{
-  --bgA:#0c0f14;
-  --bgB:#1b2230;
-  --fg:#ffffff;
-  --muted:rgba(255,255,255,.7);
-  --dotOff:rgba(255,255,255,.22);
-  --dotOn:rgba(255,255,255,.8);
+  --bgA:#ffffff;
+  --bgB:#f2f2f2;
+  --fg:#0b0b0b;
+  --muted:rgba(0,0,0,.55);
+  --dotOff:rgba(0,0,0,.25);
+  --dotOn:rgba(0,0,0,.85);
 }
-
-html,body{
-  margin:0;
-  padding:0;
-}
-
+html,body{margin:0;padding:0;}
 body{
   font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;
   background: radial-gradient(1200px 700px at 20% 20%, var(--bgB), var(--bgA));
-  color: var(--fg);
+  color:var(--fg);
   overflow-x:hidden;
 }
 
-/* ===== WebGL background ===== */
-.bg{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-canvas{width:100%;height:100%;display:block;}
+/* WebGL */
+.bg{position:fixed; inset:0; z-index:0; pointer-events:none;}
+canvas{width:100%; height:100%; display:block;}
 
-/* ===== UI ===== */
+/* Status */
 .status{
-  position:fixed;
-  top:24px;
-  left:50%;
+  position:fixed; top:26px; left:50%;
   transform:translateX(-50%);
-  display:flex;
-  gap:40px;
-  z-index:5;
-  pointer-events:none;
+  display:flex; gap:clamp(18px,3vw,44px);
+  z-index:5; pointer-events:none;
 }
 .status__item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-weight:600;
-  font-size:15px;
+  display:flex; align-items:center; gap:10px;
+  font-weight:650; font-size:14px;
+  letter-spacing:.08em; text-transform:uppercase;
 }
-.dot{
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:var(--dotOff);
-}
-.status__item.is-active .dot{ background:var(--dotOn); }
+.dot{width:12px; height:12px; border-radius:999px; background:var(--dotOff);}
+.status__item.is-active .dot{background:var(--dotOn);}
 
-/* ===== Scroll structure ===== */
-.scroll-space{
-  height:400vh; /* 4 panels = 400vh */
-}
-
+/* Sideways scroll */
+.scroll-space{height:400vh;}
 .rail{
-  position:fixed;
-  top:0;
-  left:0;
-  height:100vh;
-  width:400vw;
-  display:flex;
-  z-index:2;
-  will-change:transform;
+  position:fixed; inset:0;
+  width:400vw; height:100vh;
+  display:flex; z-index:2;
 }
-
 .chapter{
-  width:100vw;
-  height:100vh;
-  display:grid;
-  align-items:center;
+  width:100vw; height:100vh; flex:0 0 100vw;
+  display:grid; align-items:center;
   padding:clamp(32px,6vw,96px);
-  box-sizing:border-box;
 }
-
-.wrap{
-  max-width:1100px;
-}
-
+.wrap{max-width:1100px;}
 .kicker{
-  font-size:13px;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  opacity:.7;
-  margin-bottom:16px;
+  font-size:12px; letter-spacing:.22em;
+  text-transform:uppercase; opacity:.6; margin-bottom:18px;
 }
-
 h1{
   font-size:clamp(56px,7vw,120px);
-  line-height:.92;
-  letter-spacing:-0.04em;
-  margin:0 0 20px;
-  max-width:14ch;
-}
-
-.lead{
-  font-size:clamp(20px,2.4vw,42px);
-  font-weight:800;
-  line-height:1.14;
-  max-width:42ch;
-}
-
-.sub{
-  margin-top:16px;
-  font-size:16px;
-  line-height:1.6;
-  max-width:60ch;
-  color:var(--muted);
+  line-height:.92; letter-spacing:-0.04em;
+  margin:0; font-weight:800;
+  text-transform:uppercase; max-width:14ch;
 }
 </style>
 </head>
 
 <body>
 
-<!-- WebGL -->
 <div class="bg"><canvas id="bgCanvas"></canvas></div>
 
-<!-- Status -->
-<nav class="status" id="status">
+<nav class="status">
   <div class="status__item is-active" data-i="0"><span class="dot"></span>FILM</div>
-  <div class="status__item" data-i="1"><span class="dot"></span>Photography</div>
-  <div class="status__item" data-i="2"><span class="dot"></span>Media</div>
-  <div class="status__item" data-i="3"><span class="dot"></span>Consulting</div>
+  <div class="status__item" data-i="1"><span class="dot"></span>PHOTOGRAPHY</div>
+  <div class="status__item" data-i="2"><span class="dot"></span>MEDIA CAMPAIGNS</div>
+  <div class="status__item" data-i="3"><span class="dot"></span>CONSULTING</div>
 </nav>
 
-<!-- Horizontal rail -->
 <div class="rail" id="rail">
-  <section class="chapter">
-    <div class="wrap">
-      <p class="kicker">Pillar 01</p>
-      <h1>We make films,<br>not content.</h1>
-      <p class="lead">Narrative-driven filmmaking with intention.</p>
-      <p class="sub">Stories designed to last beyond campaigns.</p>
-    </div>
-  </section>
-
-  <section class="chapter">
-    <div class="wrap">
-      <p class="kicker">Pillar 02</p>
-      <h1>Images that<br>carry weight.</h1>
-      <p class="lead">Photography built on clarity and mood.</p>
-      <p class="sub">Frames that communicate, not decorate.</p>
-    </div>
-  </section>
-
-  <section class="chapter">
-    <div class="wrap">
-      <p class="kicker">Pillar 03</p>
-      <h1>Ideas,<br>structured to travel.</h1>
-      <p class="lead">Campaigns designed for reach and meaning.</p>
-      <p class="sub">Strategy before noise.</p>
-    </div>
-  </section>
-
-  <section class="chapter">
-    <div class="wrap">
-      <p class="kicker">Pillar 04</p>
-      <h1>Experience,<br>turned into direction.</h1>
-      <p class="lead">Clear decisions, grounded in reality.</p>
-      <p class="sub">No unnecessary layers.</p>
-    </div>
-  </section>
+  <section class="chapter"><div class="wrap"><p class="kicker">Pillar 01</p><h1>WE MAKE FILMS,<br>NOT CONTENT.</h1></div></section>
+  <section class="chapter"><div class="wrap"><p class="kicker">Pillar 02</p><h1>IMAGES THAT<br>CARRY WEIGHT.</h1></div></section>
+  <section class="chapter"><div class="wrap"><p class="kicker">Pillar 03</p><h1>IDEAS,<br>STRUCTURED TO TRAVEL.</h1></div></section>
+  <section class="chapter"><div class="wrap"><p class="kicker">Pillar 04</p><h1>EXPERIENCE,<br>TURNED INTO DIRECTION.</h1></div></section>
 </div>
 
-<!-- Vertical scroll driver -->
 <div class="scroll-space"></div>
 
-<!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script>
-/* ===============================
-   SIDEWAYS SCROLL (CORE LOGIC)
-================================ */
+/* =====================
+   HELPERS
+===================== */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp =(a,b,t)=>a+(b-a)*t;
 
-const rail = document.getElementById("rail");
-const dots = document.querySelectorAll(".status__item");
+/* =====================
+   SIDEWAYS SCROLL
+===================== */
+const rail=document.getElementById("rail");
+const dots=[...document.querySelectorAll(".status__item")];
+let targetY=0,smoothY=0,progress=0;
+addEventListener("scroll",()=>targetY=scrollY,{passive:true});
 
-let targetY = 0;
-let smoothY = 0;
+function scrollLoop(){
+  smoothY+=(targetY-smoothY)*0.08;
+  const max=innerHeight*3;
+  progress=clamp(smoothY/max,0,1);
 
-function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+  rail.style.transform=`translate3d(${-progress*innerWidth*3}px,0,0)`;
 
-window.addEventListener("scroll",()=>{
-  targetY = window.scrollY;
-},{passive:true});
+  const idx=Math.round(progress*3);
+  dots.forEach(d=>d.classList.toggle("is-active",+d.dataset.i===idx));
 
-function update(){
-  smoothY += (targetY - smoothY) * 0.08;
+  const darkT=clamp((progress-0.5)*2,0,1);
+  document.documentElement.style.setProperty("--bgA",
+    `rgb(${lerp(255,12,darkT)},${lerp(255,15,darkT)},${lerp(255,20,darkT)})`);
+  document.documentElement.style.setProperty("--bgB",
+    `rgb(${lerp(242,27,darkT)},${lerp(242,34,darkT)},${lerp(242,48,darkT)})`);
+  document.documentElement.style.setProperty("--fg",darkT<0.5?"#0b0b0b":"#ffffff");
 
-  const maxScroll = window.innerHeight * 3;
-  const progress = clamp(smoothY / maxScroll, 0, 1);
-
-  rail.style.transform =
-    `translateX(${-progress * window.innerWidth * 3}px)`;
-
-  const idx = Math.round(progress * 3);
-  dots.forEach(d=>d.classList.toggle("is-active", +d.dataset.i === idx));
-
-  requestAnimationFrame(update);
+  requestAnimationFrame(scrollLoop);
 }
-update();
+scrollLoop();
 
-/* ===============================
-   WEBGL SPHERE (INERTIA)
-================================ */
+/* =====================
+   WEBGL TYPO SPHERE (TEXTURE)
+===================== */
+const canvas=document.getElementById("bgCanvas");
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(2,devicePixelRatio));
 
-const canvas = document.getElementById("bgCanvas");
-const renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-renderer.setPixelRatio(Math.min(2,window.devicePixelRatio));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
+camera.position.set(0,1.4,6);
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45,1,0.1,100);
-camera.position.z = 6;
-
-scene.add(new THREE.AmbientLight(0xffffff,.4));
-const light = new THREE.DirectionalLight(0xffffff,1.2);
-light.position.set(4,3,6);
-scene.add(light);
-
-const geo = new THREE.IcosahedronGeometry(1.4,64);
-const mat = new THREE.MeshStandardMaterial({
-  color:0xffffff,
-  roughness:.75,
-  metalness:.05
-});
-const sphere = new THREE.Mesh(geo,mat);
-// DESIGN PATH (left → right)
-const startX = -1.6;
-const endX   =  1.6;
-
-// Optional vertical arc (subtle, elegant)
-const arcY = Math.sin(progress * Math.PI) * 0.35;
-
-// BASE position from scroll progress
-const baseX = startX + (endX - startX) * progress;
-
-// PHYSICS offset from velocity
-const physicsX = vel * 0.002;
-const physicsY = vel * 0.001;
-
-// Final position
-sphere.position.x = baseX + physicsX;
-sphere.position.y = arcY + physicsY;
-
-scene.add(sphere);
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const key=new THREE.DirectionalLight(0xffffff,1.2);
+key.position.set(4,6,5);
+scene.add(key);
 
 function resize(){
-  renderer.setSize(window.innerWidth,window.innerHeight,false);
-  camera.aspect = window.innerWidth/window.innerHeight;
+  renderer.setSize(innerWidth,innerHeight,false);
+  camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
 }
-window.addEventListener("resize",resize);
+addEventListener("resize",resize);
 resize();
 
-let lastY = 0;
-function render(){
-  const vel = smoothY - lastY;
-  lastY = smoothY;
+/* === TEXTURE CANVAS === */
+const words=[
+  "FILM","CINEMA","EDIT","FRAME","CAMERA","STORY","CUT","LIGHT",
+  "PHOTOGRAPHY","FOCUS","LENS","COMPOSITION",
+  "MEDIA","CAMPAIGN","STRATEGY","DISTRIBUTION",
+  "CONSULTING","DIRECTION","WORKFLOW","IDENTITY"
+];
 
-  sphere.rotation.y += vel * 0.0006;
-  sphere.rotation.x += vel * 0.0004;
-  sphere.position.y = Math.sin(smoothY * 0.002) * 0.25;
+const texCanvas=document.createElement("canvas");
+texCanvas.width=2048;
+texCanvas.height=1024;
+const ctx=texCanvas.getContext("2d");
+
+ctx.fillStyle="#ffffff";
+ctx.fillRect(0,0,texCanvas.width,texCanvas.height);
+ctx.fillStyle="#000000";
+ctx.font="700 64px system-ui, Arial";
+ctx.textBaseline="middle";
+
+let y=80;
+for(let row=0; row<12; row++){
+  let x=40;
+  for(let i=0;i<words.length;i++){
+    ctx.fillText(words[(row+i)%words.length],x,y);
+    x+=ctx.measureText(words[(row+i)%words.length]).width+80;
+    if(x>texCanvas.width) break;
+  }
+  y+=80;
+}
+
+const texture=new THREE.CanvasTexture(texCanvas);
+texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
+texture.repeat.set(1,1);
+
+const sphereGeo=new THREE.SphereGeometry(2.8,96,96);
+const sphereMat=new THREE.MeshStandardMaterial({
+  map:texture,
+  roughness:0.6,
+  metalness:0.05
+});
+
+const sphere=new THREE.Mesh(sphereGeo,sphereMat);
+sphere.position.y=-2.2; // crop bottom
+scene.add(sphere);
+
+let lastY=0;
+function render(){
+  const vel=smoothY-lastY;
+  lastY=smoothY;
+
+  sphere.rotation.y+=0.003+vel*0.0006;
+  sphere.rotation.x=Math.sin(progress*Math.PI)*0.15;
+
+  sphere.position.x=lerp(-1.6,1.6,progress);
 
   renderer.render(scene,camera);
   requestAnimationFrame(render);
