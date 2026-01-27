@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <canvas class="webgl-bg" id="webgl-bg" aria-hidden="true"></canvas>
     <header class="site-header" aria-label="Primary">
       <div class="site-brand">Urbanoise</div>
       <nav class="nav-links">
@@ -62,7 +63,7 @@
           id="horiz"
           aria-label="Urbanoise horizontal scroll"
         >
-          <div class="media-window" aria-hidden="true"></div>
+          <div class="media-window" id="slideshow1"></div>
           <div class="horizontal-scroll-container">
             <article class="panel panel-1">
               <div class="panel-copy panel-copy-center">
@@ -85,17 +86,15 @@
               </div>
             </article>
             <article class="panel panel-3">
-              <div class="panel-copy panel-copy-left">
-                <p class="eyebrow">Page 4</p>
-                <h2>Type as atmosphere.</h2>
-                <p>
-                  A quiet, text-only sequence that prepares the transition back to the vertical
-                  flow.
-                </p>
-              </div>
+              <div class="panel-copy panel-copy-left"></div>
             </article>
             <article class="panel panel-4">
-              <div class="panel-copy panel-copy-right"></div>
+              <div class="panel-copy panel-copy-right panel-copy-overlay">
+                <h2>A window from the right.</h2>
+                <p>
+                  This area is a window that comes up from the right as we continue scrolling.
+                </p>
+              </div>
             </article>
             <article class="panel panel-5">
               <div class="panel-copy panel-copy-right">
