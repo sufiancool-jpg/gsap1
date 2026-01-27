@@ -1,0 +1,482 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pillars Prototype</title>
+
+
+  <style>
+    :root{
+      --bg1:#f6f6f6;
+      --bg2:#ffffff;
+      --fg:#0b0b0b;
+      --muted: rgba(0,0,0,.55);
+      --line: rgba(0,0,0,.10);
+      --dotOff: rgba(0,0,0,.18);
+      --dotOn: rgba(0,0,0,.55);
+    }
+
+
+    html,body{height:100%; margin:0; font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;}
+    body{background:#111;}
+
+
+    /* spacer before/after just for demo */
+    .spacer{
+      height: 120vh;
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      opacity:.75;
+    }
+
+
+    /* ===== PILLARS SECTION ===== */
+    .pillars{
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--fg);
+      background: radial-gradient(1200px 700px at 20% 20%, var(--bg2), var(--bg1));
+    }
+
+
+    /* top nav */
+    .pillars__nav{
+      position:absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      display:flex;
+      gap: clamp(18px, 3vw, 44px);
+      align-items:center;
+      z-index: 20;
+      user-select:none;
+      pointer-events:none; /* purely status */
+    }
+
+
+    .pillars__navItem{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-size: 18px;
+      letter-spacing: .02em;
+      font-weight: 600;
+      opacity: .95;
+      white-space: nowrap;
+    }
+
+
+    .pillars__dot{
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--dotOff);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.04) inset;
+      transition: background 220ms ease;
+      flex: 0 0 14px;
+    }
+    .pillars__navItem.is-active .pillars__dot{
+      background: var(--dotOn);
+    }
+
+
+    /* thin top rule like editorial */
+    .pillars__rule{
+      position:absolute;
+      left: clamp(28px, 5vw, 64px);
+      right: clamp(28px, 5vw, 64px);
+      top: 66px;
+      height: 1px;
+      background: var(--line);
+      z-index: 10;
+    }
+
+
+    /* layout wrapper */
+    .pillars__viewport{
+      position:absolute;
+      inset: 0;
+      z-index: 5;
+      padding: clamp(28px, 5vw, 72px);
+      padding-top: 110px; /* room for nav */
+      box-sizing:border-box;
+    }
+
+
+    /* “carousel” track (4 panels) */
+    .pillars__track{
+      position:absolute;
+      inset: 0;
+      display:flex;
+      width: 400vw; /* 4 panels */
+      height: 100%;
+      will-change: transform;
+    }
+
+
+    .pillar{
+      width: 100vw;
+      height: 100%;
+      position: relative;
+      display:block;
+    }
+
+
+    /* text zones: 3 independent blocks */
+    .pillar__hero{
+      position:absolute;
+      left: clamp(28px, 5vw, 72px);
+      top: clamp(86px, 14vh, 170px);
+      max-width: 14ch;
+      font-size: clamp(52px, 7vw, 110px);
+      line-height: .95;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin:0;
+      will-change: transform, opacity, filter;
+    }
+
+
+    .pillar__mid{
+      position:absolute;
+      left: 50%;
+      bottom: clamp(120px, 20vh, 240px);
+      transform: translateX(-50%);
+      width: min(980px, calc(100vw - 2*clamp(28px, 5vw, 72px)));
+      text-align:center;
+      font-size: clamp(22px, 2.2vw, 40px);
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin:0;
+      will-change: transform, opacity, filter;
+    }
+
+
+    .pillar__kicker{
+      position:absolute;
+      left: 50%;
+      bottom: clamp(70px, 10vh, 140px);
+      transform: translateX(-50%);
+      width: min(980px, calc(100vw - 2*clamp(28px, 5vw, 72px)));
+      text-align:center;
+      font-size: clamp(14px, 1.15vw, 18px);
+      line-height: 1.55;
+      font-weight: 600;
+      color: var(--muted);
+      margin:0;
+      will-change: transform, opacity, filter;
+    }
+
+
+    /* optional hint */
+    .pillars__hint{
+      position:absolute;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      font-size: 12px;
+      letter-spacing:.14em;
+      text-transform: uppercase;
+      opacity: .55;
+      z-index: 30;
+      user-select:none;
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+
+<body>
+  <div class="spacer">Scroll down to the “Pillars” section</div>
+
+
+  <section class="pillars" id="pillars">
+    <div class="pillars__nav" aria-hidden="true">
+      <div class="pillars__navItem is-active" data-i="0"><span class="pillars__dot"></span><span>FILM</span></div>
+      <div class="pillars__navItem" data-i="1"><span class="pillars__dot"></span><span>Photography</span></div>
+      <div class="pillars__navItem" data-i="2"><span class="pillars__dot"></span><span>Media campaigns</span></div>
+      <div class="pillars__navItem" data-i="3"><span class="pillars__dot"></span><span>Consulting</span></div>
+    </div>
+
+
+    <div class="pillars__rule" aria-hidden="true"></div>
+
+
+    <div class="pillars__viewport">
+      <div class="pillars__track" id="pillarsTrack">
+        <!-- 0 FILM -->
+        <article class="pillar" data-pillar="0">
+          <h2 class="pillar__hero">We make films,<br>not content.</h2>
+          <p class="pillar__mid">
+            From concept to final cut, we focus on stories that feel intentional,
+            human, and lasting — not disposable.
+          </p>
+          <p class="pillar__kicker">
+            Strategy-led filmmaking. Crafted visuals. Films that stay relevant beyond the campaign.
+          </p>
+        </article>
+
+
+        <!-- 1 PHOTO -->
+        <article class="pillar" data-pillar="1">
+          <h2 class="pillar__hero">Images that<br>carry weight.</h2>
+          <p class="pillar__mid">
+            Commercial, editorial, and artistic photography built around clarity and mood.
+            Every frame is composed to communicate — not decorate.
+          </p>
+          <p class="pillar__kicker">
+            Consistent visual language. Built for brands, events, and long-term identity.
+          </p>
+        </article>
+
+
+        <!-- 2 CAMPAIGNS -->
+        <article class="pillar" data-pillar="2">
+          <h2 class="pillar__hero">Ideas,<br>structured to travel.</h2>
+          <p class="pillar__mid">
+            We design media campaigns that connect strategy, platforms, and audiences — without noise.
+            From launch concepts to long-tail distribution, everything is intentional.
+          </p>
+          <p class="pillar__kicker">
+            Clear messaging. Precise targeting. Content that actually lands.
+          </p>
+        </article>
+
+
+        <!-- 3 CONSULTING -->
+        <article class="pillar" data-pillar="3">
+          <h2 class="pillar__hero">Experience,<br>turned into direction.</h2>
+          <p class="pillar__mid">
+            We help brands and teams make better decisions — faster.
+            From positioning and media strategy to workflows and digital presence.
+          </p>
+          <p class="pillar__kicker">
+            One clear perspective. No unnecessary layers. Practical guidance, grounded in real-world execution.
+          </p>
+        </article>
+      </div>
+    </div>
+
+
+    <div class="pillars__hint">Scroll to move • 3 beats per pillar</div>
+  </section>
+
+
+  <div class="spacer">After section</div>
+
+
+  <!-- GSAP -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Observer.min.js"></script>
+
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger, Observer);
+
+
+    const section = document.getElementById("pillars");
+    const track = document.getElementById("pillarsTrack");
+    const navItems = Array.from(section.querySelectorAll(".pillars__navItem"));
+    const pillars = Array.from(section.querySelectorAll(".pillar"));
+
+
+    // Designed theme stops (gradient + text colors)
+    const THEMES = [
+      { bg1:"#f6f6f6", bg2:"#ffffff", fg:"#0b0b0b", muted:"rgba(0,0,0,.55)", dotOn:"rgba(0,0,0,.55)", dotOff:"rgba(0,0,0,.18)", line:"rgba(0,0,0,.10)" },
+      { bg1:"#0c0f14", bg2:"#1b2230", fg:"#ffffff", muted:"rgba(255,255,255,.70)", dotOn:"rgba(255,255,255,.70)", dotOff:"rgba(255,255,255,.20)", line:"rgba(255,255,255,.12)" },
+      { bg1:"#24121b", bg2:"#5a1f3e", fg:"#ffffff", muted:"rgba(255,255,255,.70)", dotOn:"rgba(255,255,255,.70)", dotOff:"rgba(255,255,255,.20)", line:"rgba(255,255,255,.12)" },
+      { bg1:"#081a14", bg2:"#0d3a2b", fg:"#eafff6", muted:"rgba(234,255,246,.70)", dotOn:"rgba(234,255,246,.70)", dotOff:"rgba(234,255,246,.22)", line:"rgba(234,255,246,.14)" },
+    ];
+
+
+    // State machine:
+    // pillarIndex: 0..3
+    // beat: 0..2  (3 beats within each pillar)
+    let pillarIndex = 0;
+    let beat = 0;
+    let locked = false;
+
+
+    function setNavActive(i){
+      navItems.forEach((el) => el.classList.toggle("is-active", Number(el.dataset.i) === i));
+    }
+
+
+    function applyTheme(i){
+      const t = THEMES[i];
+      gsap.to(section, {
+        duration: 0.65,
+        ease: "power2.out",
+        "--bg1": t.bg1,
+        "--bg2": t.bg2,
+        "--fg": t.fg,
+        "--muted": t.muted,
+        "--dotOn": t.dotOn,
+        "--dotOff": t.dotOff,
+        "--line": t.line
+      });
+    }
+
+
+    function pillarEls(i){
+      const root = pillars[i];
+      return {
+        hero: root.querySelector(".pillar__hero"),
+        mid: root.querySelector(".pillar__mid"),
+        kick: root.querySelector(".pillar__kicker"),
+      };
+    }
+
+
+    // Per-pillar beat animation (separate movement)
+    // Beat 0: hero slides left a bit
+    // Beat 1: mid slides left a bit
+    // Beat 2: kicker slides left a bit
+    function playBeat(i, b, direction){
+      const { hero, mid, kick } = pillarEls(i);
+
+
+      const sign = direction === "forward" ? -1 : 1; // move left on forward
+      const distBig = 120;
+      const distMid = 90;
+      const distSmall = 70;
+
+
+      const tl = gsap.timeline({
+        defaults:{ duration: 0.6, ease:"power3.out" },
+        onComplete(){ locked = false; }
+      });
+
+
+      // subtle “physics” feel: tiny overshoot
+      const o = { duration: 0.7, ease: "power3.out" };
+
+
+      if (b === 0){
+        tl.to(hero, { x: sign * distBig, ...o }, 0);
+      } else if (b === 1){
+        tl.to(mid,  { x: sign * distMid, ...o }, 0);
+      } else {
+        tl.to(kick, { x: sign * distSmall, ...o }, 0);
+      }
+
+
+      // micro parallax “weight” on the whole pillar while beating
+      tl.to(pillars[i], { y: direction === "forward" ? -6 : 6, duration: 0.35, ease:"power2.out" }, 0)
+        .to(pillars[i], { y: 0, duration: 0.45, ease:"power2.out" }, 0.25);
+
+
+      return tl;
+    }
+
+
+    // Move carousel to a pillar (hard stop), then reset beat transforms cleanly
+    function goToPillar(nextIndex){
+      pillarIndex = nextIndex;
+      beat = 0;
+
+
+      setNavActive(pillarIndex);
+      applyTheme(pillarIndex);
+
+
+      // slide track
+      gsap.to(track, {
+        x: -pillarIndex * window.innerWidth,
+        duration: 0.9,
+        ease: "power3.inOut",
+        onComplete(){
+          // reset beat transforms on arrival so each pillar starts fresh
+          pillars.forEach((p) => {
+            p.querySelector(".pillar__hero").style.transform = "";
+            p.querySelector(".pillar__mid").style.transform = "";
+            p.querySelector(".pillar__kicker").style.transform = "";
+          });
+          locked = false;
+        }
+      });
+    }
+
+
+    function forward(){
+      if (locked) return;
+      locked = true;
+
+
+      // within pillar: 3 beats
+      if (beat < 2){
+        playBeat(pillarIndex, beat, "forward");
+        beat += 1;
+        return;
+      }
+
+
+      // after beat 2 → next pillar
+      if (pillarIndex < 3){
+        goToPillar(pillarIndex + 1);
+      } else {
+        // last pillar: just unlock (or loop if you want)
+        locked = false;
+      }
+    }
+
+
+    function backward(){
+      if (locked) return;
+      locked = true;
+
+
+      // rewind beats first
+      if (beat > 0){
+        beat -= 1;
+        playBeat(pillarIndex, beat, "backward");
+        return;
+      }
+
+
+      // at beat 0 → previous pillar
+      if (pillarIndex > 0){
+        goToPillar(pillarIndex - 1);
+      } else {
+        locked = false;
+      }
+    }
+
+
+    // Pin section and route wheel/touch into our state machine
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top top",
+      end: "+=220%", // enough room to interact; adjust later
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+      onEnter(){ setNavActive(pillarIndex); applyTheme(pillarIndex); },
+    });
+
+
+    // Convert wheel/touch to forward/back steps (carousel feel)
+    Observer.create({
+      target: section,
+      type: "wheel,touch,pointer",
+      wheelSpeed: 1,
+      tolerance: 8,
+      preventDefault: true,
+      onDown: () => backward(),
+      onUp: () => forward(),
+    });
+
+
+    // keep track aligned on resize
+    addEventListener("resize", () => {
+      gsap.set(track, { x: -pillarIndex * window.innerWidth });
+    });
+  </script>
+</body>
+</html>

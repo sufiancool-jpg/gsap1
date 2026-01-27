@@ -801,12 +801,9 @@ const initFullscreenWebGL = () => {
       float h = state.x;
 
       vec2 pos = vUv * 2.0 - 1.0;
-      float wave1 = sin(vUv.x * 12.0 + uTime * 0.6);
-      float wave2 = sin(vUv.y * 9.0 + uTime * 0.4 + vUv.x * 2.0);
-      float wave3 = sin((vUv.x + vUv.y) * 7.0 + uTime * 0.7);
-      float baseWave = (wave1 * 0.007 + wave2 * 0.006 + wave3 * 0.004) * uMotionScale;
-      pos.y += baseWave;
-      pos.x += baseWave * 0.18;
+      float rowDir = mod(iy, 2.0) < 0.5 ? -1.0 : 1.0;
+      float wave = sin(uTime * uMotionScale + ix * 0.06) * 0.002;
+      pos.y += wave * rowDir;
       pos.y += h * uHeightAmp;
       gl_Position = vec4(pos, 0.0, 1.0);
 
@@ -1010,7 +1007,6 @@ const initFullscreenWebGL = () => {
     if (!event.isPrimary) return;
     pointer.clickBoost = 1;
     pointer.clickTime = performance.now();
-    pointer.speed = Math.max(pointer.speed, 0.6);
     updatePointer(event);
   };
 
@@ -1046,15 +1042,15 @@ const initFullscreenWebGL = () => {
     gl.useProgram(renderProgram);
     gl.uniform2f(renderUniforms.grid, gridX, gridY);
     gl.uniform1f(renderUniforms.heightAmp, prefersReducedMotion ? 0.16 : 0.28);
-    gl.uniform1f(renderUniforms.pointSize, 5.2 * dpr);
-    gl.uniform3f(renderUniforms.color, 0.6, 0.95, 0.9);
+    gl.uniform1f(renderUniforms.pointSize, 6 * dpr);
+    gl.uniform3f(renderUniforms.color, 0.98, 0.98, 0.98);
     gl.uniform1f(renderUniforms.useFloat, useFloat ? 1 : 0);
     gl.uniform1f(renderUniforms.visibility, 0);
     gl.uniform2f(renderUniforms.revealPos, 0.5, 0.5);
     gl.uniform1f(renderUniforms.revealRadius, 0);
-    gl.uniform1f(renderUniforms.revealSoftness, 3.0);
+    gl.uniform1f(renderUniforms.revealSoftness, 2.2);
     gl.uniform1f(renderUniforms.time, 0);
-    gl.uniform1f(renderUniforms.motionScale, 1);
+    gl.uniform1f(renderUniforms.motionScale, 0.6);
   };
 
   gl.disable(gl.CULL_FACE);
@@ -1064,7 +1060,7 @@ const initFullscreenWebGL = () => {
 
   gl.useProgram(simProgram);
   gl.uniform1i(simUniforms.state, 0);
-  gl.uniform1f(simUniforms.damping, prefersReducedMotion ? 0.992 : 0.984);
+  gl.uniform1f(simUniforms.damping, prefersReducedMotion ? 0.992 : 0.986);
   gl.uniform1f(simUniforms.useFloat, useFloat ? 1 : 0);
 
   gl.useProgram(renderProgram);
@@ -1076,13 +1072,13 @@ const initFullscreenWebGL = () => {
   let lastTime = performance.now();
   const baseStrength = 0.004;
   const speedStrength = 0.12;
-  const baseRadius = 0.05;
-  const revealBase = 0.9;
-  const revealBoost = 0.2;
-  const idleStrength = 0.0025;
+  const baseRadius = 0.045;
+  const revealBase = 0.12;
+  const revealBoost = 0.1;
+  const idleStrength = 0.003;
   const idleRadius = 0.05;
-  const idleReveal = 1.4;
-  const idleVisibility = 0.45;
+  const idleReveal = 0.08;
+  const idleVisibility = 0.22;
 
   const frame = (time) => {
     lastTime = time;
@@ -1095,8 +1091,8 @@ const initFullscreenWebGL = () => {
     const activePulse = 0.92 + 0.08 * Math.sin(t * 0.6);
     const idleMotion = prefersReducedMotion ? 0 : 1;
     const targetVisibility = pointer.active
-      ? 0.95
-      : idleVisibility * (0.85 + 0.15 * idlePulse) * idleMotion;
+      ? 0.9
+      : idleVisibility * idlePulse * idleMotion;
     pointer.visible = lerp(pointer.visible, targetVisibility, 0.07);
     const targetReveal = pointer.active
       ? revealBase + pointer.speed * revealBoost
@@ -1104,23 +1100,23 @@ const initFullscreenWebGL = () => {
     pointer.revealRadius = lerp(pointer.revealRadius, targetReveal, 0.08);
 
     const motionScale = prefersReducedMotion ? 0.35 : 1;
-    pointer.clickBoost = lerp(pointer.clickBoost, 0, 0.04);
+    pointer.clickBoost = lerp(pointer.clickBoost, 0, 0.06);
     const clickPhase = Math.sin(((time - pointer.clickTime) / 1000) * 6.5);
     const clickWave = pointer.active
-      ? pointer.clickBoost * (0.6 + 0.4 * clickPhase)
+      ? pointer.clickBoost * (0.7 + 0.3 * clickPhase)
       : 0;
 
     const strength = pointer.active
-      ? (baseStrength + pointer.speed * speedStrength) * motionScale * activePulse + clickWave * 0.08
+      ? (baseStrength + pointer.speed * speedStrength) * motionScale * activePulse + clickWave * 0.025
       : idleStrength * idlePulse * idleMotion;
     const radius = pointer.active
-      ? baseRadius + pointer.speed * 0.05 + 0.01 * activePulse + clickWave * 0.18
+      ? baseRadius + pointer.speed * 0.05 + 0.01 * activePulse + clickWave * 0.08
       : idleRadius;
     const drag = pointer.speed * 0.11;
-    const visibility = Math.min(1, pointer.visible);
+    const visibility = Math.min(1, pointer.visible * 1.05);
     const heightAmp =
-      (prefersReducedMotion ? 0.12 : 0.2) + pointer.speed * (prefersReducedMotion ? 0.05 : 0.16);
-    const renderMotionScale = pointer.active ? 0.4 : 1.0;
+      (prefersReducedMotion ? 0.14 : 0.22) + pointer.speed * (prefersReducedMotion ? 0.06 : 0.18);
+    const renderMotionScale = pointer.active ? 0.35 : 0.6;
     const idleX = 0.5 + Math.cos(t * 0.22) * 0.08;
     const idleY = 0.5 + Math.sin(t * 0.18) * 0.07;
 
