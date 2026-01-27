@@ -1,0 +1,308 @@
+:root {
+  --bg: #000;
+  --text: #fff;
+  --muted: rgba(255, 255, 255, 0.6);
+  --nav-base: #fff;
+  --nav-fill: #fff;
+  --nav-invert: #000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+#smooth-wrapper {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+#smooth-content {
+  position: relative;
+}
+
+.site-header {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  left: 2rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-brand {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text);
+  pointer-events: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.nav-button {
+  position: relative;
+  overflow: hidden;
+  color: var(--nav-base);
+  border: 1px solid var(--nav-base);
+  text-decoration: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.nav-button.is-hover {
+  color: var(--nav-invert);
+}
+
+.nav-button .btn-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300%;
+  height: 300%;
+  background: var(--nav-fill);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.nav-button .btn-label {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.stage {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #000;
+  perspective: 1200px;
+  overflow: hidden;
+}
+
+.hero-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 200vw;
+  height: 100%;
+}
+
+.hero-panel {
+  flex: 0 0 100vw;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.logo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(2.2rem, 7vw, 6rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.logo-button {
+  cursor: pointer;
+  user-select: none;
+}
+
+.video-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: #000;
+  z-index: 3;
+}
+
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.75);
+  color: rgba(255, 255, 255, 0.9);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.video-fallback.is-hidden {
+  display: none;
+}
+
+.scroll-cta {
+  position: absolute;
+  bottom: 3.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  opacity: 0;
+  z-index: 4;
+  pointer-events: auto;
+}
+
+.mouse {
+  width: 26px;
+  height: 42px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  display: grid;
+  place-items: start center;
+  padding-top: 6px;
+}
+
+.wheel {
+  width: 4px;
+  height: 8px;
+  background: #fff;
+  border-radius: 4px;
+  display: block;
+}
+
+.cta-text {
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-photo-media {
+  width: 100%;
+  height: 100%;
+  background-image: url("https://images.squarespace-cdn.com/content/v1/678bcd3ba9db73410ba04e42/6518e0c1-eb15-4b07-ba32-c2a63fe880ae/Architektur_Sanaa-2.jpg?format=2500w");
+  background-size: cover;
+  background-position: center;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.about {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(4rem, 10vw, 10rem) clamp(1.5rem, 8vw, 10rem);
+  background: #fff;
+  color: #000;
+  --muted: rgba(0, 0, 0, 0.6);
+}
+
+.about-inner {
+  max-width: 860px;
+}
+
+.about-inner h2 {
+  margin-top: 0.6rem;
+  font-size: clamp(2rem, 5vw, 3.3rem);
+}
+
+.about-inner p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.stats {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.stat-value {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.2rem;
+  display: block;
+}
+
+.stat-label {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+  }
+
+  .nav-links {
+    gap: 0.5rem;
+  }
+
+  .nav-button {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.62rem;
+  }
+
+  .scroll-cta {
+    bottom: 2.2rem;
+  }
+}

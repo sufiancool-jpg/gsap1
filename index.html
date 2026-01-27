@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Urbanoise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary">
+      <div class="site-brand">Urbanoise</div>
+      <nav class="nav-links">
+        <a class="nav-button" href="mailto:info@urbanoise.com">
+          <span class="btn-fill" aria-hidden="true"></span>
+          <span class="btn-label">Start a project</span>
+        </a>
+        <a class="nav-button" href="#about">
+          <span class="btn-fill" aria-hidden="true"></span>
+          <span class="btn-label">About us</span>
+        </a>
+      </nav>
+    </header>
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <section class="stage" id="stage" aria-label="Urbanoise intro">
+          <div class="hero-track">
+            <div class="hero-panel panel-video">
+              <div class="video-frame" aria-label="Urbanoise featured video">
+                <video
+                  class="hero-video"
+                  src="https://sufianararah.com/wp-content/uploads/2025/03/website_1.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+                <div class="video-fallback">Video loading...</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage-overlay">
+            <h1 class="logo logo-button" role="button" tabindex="0" aria-label="Reveal the video">
+              Urbanoise
+            </h1>
+            <div class="scroll-cta" aria-hidden="true">
+              <div class="mouse">
+                <span class="wheel"></span>
+              </div>
+              <span class="cta-text">Scroll</span>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="horizontal-scroll-section"
+          id="horiz"
+          aria-label="Urbanoise horizontal scroll"
+        >
+          <div class="media-window" aria-hidden="true"></div>
+          <div class="horizontal-scroll-container">
+            <article class="panel panel-1">
+              <div class="panel-copy panel-copy-center">
+                <p class="eyebrow">Page 2</p>
+                <h2>Quiet geometry in a loud city.</h2>
+                <p>
+                  We follow the soft edges, the pauses between traffic, and the way light cuts
+                  through concrete.
+                </p>
+              </div>
+            </article>
+            <article class="panel panel-2">
+              <div class="panel-copy panel-copy-center">
+                <p class="eyebrow">Page 3</p>
+                <h2>Letters that breathe.</h2>
+                <p>
+                  Minimal typography, generous spacing, and a calm rhythm that keeps the story
+                  centered.
+                </p>
+              </div>
+            </article>
+            <article class="panel panel-3">
+              <div class="panel-copy panel-copy-left">
+                <p class="eyebrow">Page 4</p>
+                <h2>Type as atmosphere.</h2>
+                <p>
+                  A quiet, text-only sequence that prepares the transition back to the vertical
+                  flow.
+                </p>
+              </div>
+            </article>
+            <article class="panel panel-4">
+              <div class="panel-copy panel-copy-right"></div>
+            </article>
+            <article class="panel panel-5">
+              <div class="panel-copy panel-copy-right">
+                <p class="eyebrow">Page 5</p>
+                <h2>Type turns into a field.</h2>
+                <p>
+                  The frame expands until it holds the whole scene, then releases us back to the
+                  vertical story.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="about" id="about" aria-label="About Urbanoise">
+          <div class="about-inner">
+            <p class="eyebrow">About us</p>
+            <h2>We record the city the way it feels at midnight.</h2>
+            <p>
+              Urbanoise is a collective of filmmakers, sound designers, and street photographers
+              capturing raw urban texture. We chase reflections, human rhythm, and that hum
+              you hear when the city breathes.
+            </p>
+            <div class="stats">
+              <div class="stat">
+                <span class="stat-value">42</span>
+                <span class="stat-label">Collaborators</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">98</span>
+                <span class="stat-label">Short reels</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">8</span>
+                <span class="stat-label">Cities filmed</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <footer class="site-footer" aria-label="Urbanoise footer">
+          <div class="footer-inner">
+            <div class="footer-top">
+              <div class="footer-col">
+                <p class="footer-title">Urbanoise</p>
+                <p>Independent media studio</p>
+                <p>Based in Los Angeles, CA</p>
+              </div>
+              <div class="footer-col">
+                <p class="footer-title">Social</p>
+                <p>Instagram</p>
+                <p>LinkedIn</p>
+                <p>Vimeo</p>
+              </div>
+              <div class="footer-col footer-col-center">
+                <p class="footer-title">Contact</p>
+                <p>info@urbanoise.com</p>
+                <p>jobs@urbanoise.com</p>
+                <p>+1 (323) 555 0192</p>
+              </div>
+              <div class="footer-col footer-col-right">
+                <p class="footer-title">Legal</p>
+                <p>Imprint</p>
+                <p>Privacy policy</p>
+                <p>Accessibility</p>
+              </div>
+            </div>
+            <div class="footer-marquee">
+              <span>URBANOISE</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

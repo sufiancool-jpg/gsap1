@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Urbanoise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary">
+      <div class="site-brand">Urbanoise</div>
+      <nav class="nav-links">
+        <a class="nav-button" href="mailto:info@urbanoise.com">
+          <span class="btn-fill" aria-hidden="true"></span>
+          <span class="btn-label">Start a project</span>
+        </a>
+        <a class="nav-button" href="#about">
+          <span class="btn-fill" aria-hidden="true"></span>
+          <span class="btn-label">About us</span>
+        </a>
+      </nav>
+    </header>
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <section class="stage" id="stage" aria-label="Urbanoise intro">
+          <div class="hero-track">
+            <div class="hero-panel panel-video">
+              <div class="video-frame" aria-label="Urbanoise featured video">
+                <video
+                  class="hero-video"
+                  src="https://sufianararah.com/wp-content/uploads/2025/03/website_1.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+                <div class="video-fallback">Video loading...</div>
+              </div>
+            </div>
+            <div class="hero-panel panel-photo">
+              <div class="panel-photo-media" aria-label="Urbanoise still"></div>
+            </div>
+          </div>
+          <div class="stage-overlay">
+            <h1 class="logo logo-button" role="button" tabindex="0" aria-label="Reveal the video">
+              Urbanoise
+            </h1>
+            <div class="scroll-cta" aria-hidden="true">
+              <div class="mouse">
+                <span class="wheel"></span>
+              </div>
+              <span class="cta-text">Scroll</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="about" id="about" aria-label="About Urbanoise">
+          <div class="about-inner">
+            <p class="eyebrow">About us</p>
+            <h2>We record the city the way it feels at midnight.</h2>
+            <p>
+              Urbanoise is a collective of filmmakers, sound designers, and street photographers
+              capturing raw urban texture. We chase reflections, human rhythm, and that hum
+              you hear when the city breathes.
+            </p>
+            <div class="stats">
+              <div class="stat">
+                <span class="stat-value">42</span>
+                <span class="stat-label">Collaborators</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">98</span>
+                <span class="stat-label">Short reels</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">8</span>
+                <span class="stat-label">Cities filmed</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
