@@ -17,6 +17,8 @@
   --muted:rgba(0,0,0,.55);
   --dotOff:rgba(0,0,0,.25);
   --dotOn:rgba(0,0,0,.85);
+  --scale:1;
+  --padX:0px;
   --font-logo:'Cabinet Grotesk', sans-serif;
   --font-h1:'Satoshi', sans-serif;
   --font-heading:'Satoshi', sans-serif;
@@ -86,6 +88,7 @@ canvas{width:100%; height:100%; display:block;}
   position:relative;
 }
 .wrap{
+  width:min(1200px, 92vw);
   max-width:1200px;
   display:grid;
   gap:18px;
@@ -111,7 +114,7 @@ h2,h3{
 .subcopy{
   font-family:var(--font-body);
   font-weight:400;
-  font-size:clamp(30px,1.4vw,18px);
+  font-size:calc(20px * var(--scale));
   line-height:1.6;
   opacity:1;
   color:#000000;
@@ -159,52 +162,86 @@ h2,h3{
 }
 
 /* Slide layout variations */
-.chapter:nth-child(1) .wrap{justify-self:start; text-align:left;}
-.chapter:nth-child(2) .wrap{justify-self:end; text-align:right;}
+.chapter:nth-child(1) .wrap{justify-self:start; text-align:left; transform:translateX(var(--padX));}
+.chapter:nth-child(2) .wrap{justify-self:end; text-align:right; transform:translateX(calc(-1 * var(--padX)));}
 .chapter:nth-child(2) h1{max-width:12ch;}
-.chapter--p2 h1{margin-top:-20vh;}
-.chapter--p2 .subcopy{
-  font-size: 25px;
-  margin-top:-20vh;
-  max-width:30ch;
-  line-height:1.35;
-  transform:translateX(-25vw);
+.chapter--p2 h1{
+  margin-top:calc(-180px * var(--scale));
+  font-size:calc(122px * var(--scale));
 }
-.chapter--p3 h1{margin-top:-15vh;text-align: right;font-size: 50px;transform:translateX(-15vw)}
-.chapter--p3 .subcopy{
-  margin-top:-45vh;
+.chapter--p2 .subcopy{
+  font-size:calc(25px * var(--scale));
+  margin-top:calc(-180px * var(--scale));
   max-width:30ch;
   line-height:1.35;
-  transform:translateX(-25vw);
+  transform:translateX(calc(-360px * var(--scale)));
+}
+.chapter--p3 h1{
+  margin-top:calc(-135px * var(--scale));
+  text-align:right;
+  font-size:calc(80px * var(--scale));
+  transform:translateX(calc(-216px * var(--scale)));
+}
+.chapter--p3 .subcopy{
+  margin-top:calc(-405px * var(--scale));
+  max-width:30ch;
+  line-height:1.35;
+  transform:translateX(calc(-360px * var(--scale)));
   text-align: left;
 }
-.chapter--p4 h1{margin-top:-20vh;}
+.chapter--p4 h1{
+  margin-top:calc(-180px * var(--scale));
+  font-size:calc(122px * var(--scale));
+}
 .chapter--p4 .subcopy{
   color: #ffffff;
-  margin-top:-10vh;
+  margin-top:calc(-90px * var(--scale));
   max-width:30ch;
   line-height:1.35;
-  transform:translateX(-40vw);
+  transform:translateX(calc(-576px * var(--scale)));
 }
 .chapter:nth-child(3) .wrap{justify-self:center; text-align:center;}
-.chapter:nth-child(4) .wrap{justify-self:start; text-align:left; margin-left:2vw; margin-right:0;}
+.chapter:nth-child(4) .wrap{justify-self:start; text-align:left; margin-left:0; margin-right:0; transform:translateX(var(--padX));}
 .chapter:nth-child(4) h1{max-width:12ch;}
 
 /* Pillar 01 layout */
 .chapter--p1 h1{
-  margin-top:-40vh;
-  font-size: 120px;
+  margin-top:calc(-360px * var(--scale));
+  font-size:calc(120px * var(--scale));
   font-weight: bold;
 }
 .chapter--p1 .subcopy{
-  font-size: 20px;
+  font-size:calc(20px * var(--scale));
   position:absolute;
-  right:clamp(220px,6vw,96px);
+  right:calc(0px * var(--scale));
   bottom:auto;
   top:50%;
   transform:translateY(0);
   text-align:right;
   max-width:45ch;
+}
+
+@media (max-width:900px){
+  .chapter--p1 h1,
+  .chapter--p2 h1,
+  .chapter--p3 h1,
+  .chapter--p4 h1{
+    margin-top:0;
+    transform:none;
+    text-align:left;
+  }
+  .chapter--p1 .subcopy,
+  .chapter--p2 .subcopy,
+  .chapter--p3 .subcopy,
+  .chapter--p4 .subcopy{
+    margin-top:0;
+    transform:none;
+    position:relative;
+    right:auto;
+    top:auto;
+    text-align:left;
+  }
+  .chapter--p1 .subcopy{max-width:48ch;}
 }
 </style>
 </head>
@@ -265,6 +302,16 @@ From launch concepts to long-tail distribution, everything is intentional.</p>
 ===================== */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp =(a,b,t)=>a+(b-a)*t;
+const designW=1440;
+const designH=900;
+function updateScale(){
+  const scale=Math.min(1, innerWidth/designW, innerHeight/designH);
+  const padX=Math.max(0, (innerWidth - designW) / 2);
+  document.documentElement.style.setProperty("--scale", scale.toFixed(3));
+  document.documentElement.style.setProperty("--padX", `${padX.toFixed(0)}px`);
+}
+addEventListener("resize",updateScale);
+updateScale();
 
 /* =====================
    SIDEWAYS SCROLL
@@ -388,6 +435,26 @@ let p2Timer=null;
 let p2Active=false;
 let p2Mouse={x:0,y:0};
 let p2SplitDone=false;
+const p2Offset=16;
+const p2Pad=16;
+
+if(p2Slideshow && p2Slideshow.parentElement !== document.body){
+  document.body.appendChild(p2Slideshow);
+}
+
+function positionP2Slideshow(){
+  if(!p2Slideshow) return;
+  const w=p2Slideshow.offsetWidth;
+  const h=p2Slideshow.offsetHeight;
+  let x=p2Mouse.x + p2Offset;
+  let y=p2Mouse.y + p2Offset;
+  x=Math.min(x, innerWidth - w - p2Pad);
+  x=Math.max(p2Pad, x);
+  y=Math.min(y, innerHeight - h - p2Pad);
+  y=Math.max(p2Pad, y);
+  p2Slideshow.style.left=`${x}px`;
+  p2Slideshow.style.top=`${y}px`;
+}
 
 function splitP2Title(){
   if(!p2Target || p2SplitDone) return;
@@ -416,6 +483,7 @@ function p2Show(){
   p2Active=true;
   p2Slideshow.style.visibility="visible";
   p2Slideshow.style.opacity="1";
+  positionP2Slideshow();
   p2SlideImg.src=p2Images[p2Idx];
   p2Idx=(p2Idx+1)%p2Images.length;
   p2Timer=setInterval(()=>{
@@ -442,10 +510,7 @@ addEventListener("mousemove",(e)=>{
   p2Mouse.x=e.clientX;
   p2Mouse.y=e.clientY;
   if(!p2Active || !p2Slideshow) return;
-  const offsetX=2000;
-  const offsetY=0;
-  p2Slideshow.style.left=`${p2Mouse.x - p2Slideshow.offsetWidth/2 + offsetX}px`;
-  p2Slideshow.style.top=`${p2Mouse.y - p2Slideshow.offsetHeight/2 + offsetY}px`;
+  positionP2Slideshow();
 });
 </script>
 
