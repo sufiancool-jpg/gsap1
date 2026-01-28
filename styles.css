@@ -5,6 +5,11 @@
   --nav-base: #fff;
   --nav-fill: #fff;
   --nav-invert: #000;
+  --matte-safe: 0px;
+  --matte-inset: 0px;
+  --matte-radius: 0px;
+  --matte-opacity: 1;
+  --matte-color: 8, 44, 56;
   --font-logo: "Cabinet Grotesk", "Space Grotesk", sans-serif;
   --font-head: "Satoshi", "Space Grotesk", sans-serif;
   --font-body: "Poppins", "Space Grotesk", sans-serif;
@@ -29,6 +34,31 @@ body {
   overflow-x: hidden;
 }
 
+.matte-frame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.matte-frame::before {
+  content: "";
+  position: absolute;
+  inset: var(--matte-inset);
+  border-radius: var(--matte-radius);
+  box-shadow: 0 0 0 200vmax rgba(var(--matte-color), var(--matte-opacity));
+}
+
+.matte-frame::after {
+  content: none;
+}
+
+.matte-on .matte-frame {
+  opacity: 1;
+}
+
 h1,
 h2,
 h3 {
@@ -44,17 +74,6 @@ h3 {
   font-weight: 500;
 }
 
-.webgl-bg {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  z-index: 0;
-  pointer-events: none;
-  background: #000;
-}
-
 body.theme-light {
   --bg: #fff;
   --text: #000;
@@ -66,19 +85,25 @@ body.theme-light {
 #smooth-wrapper {
   position: fixed;
   inset: 0;
+  box-sizing: border-box;
   overflow: hidden;
   z-index: 1;
+  background: var(--bg);
 }
 
 #smooth-content {
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  min-height: 100vh;
 }
 
 .site-header {
   position: fixed;
-  top: 1.5rem;
-  right: 2rem;
-  left: 2rem;
+  top: calc(1.5rem + var(--matte-safe));
+  right: calc(2rem + var(--matte-safe));
+  left: calc(2rem + var(--matte-safe));
   z-index: 20;
   display: flex;
   align-items: center;
@@ -148,6 +173,9 @@ body.theme-light {
 .stage {
   position: relative;
   min-height: 100vh;
+  height: 100vh;
+  padding: var(--matte-safe);
+  box-sizing: border-box;
   display: grid;
   place-items: center;
   background: transparent;
@@ -159,12 +187,12 @@ body.theme-light {
   position: absolute;
   inset: 0;
   display: flex;
-  width: 100vw;
+  width: 100%;
   height: 100%;
 }
 
 .hero-panel {
-  flex: 0 0 100vw;
+  flex: 0 0 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
@@ -315,6 +343,9 @@ body.theme-light {
   --padX: 0px;
   position: relative;
   height: 100vh;
+  min-height: 100vh;
+  padding: var(--matte-safe);
+  box-sizing: border-box;
   overflow: hidden;
   background: radial-gradient(1200px 700px at 20% 20%, var(--bgB), var(--bgA));
   color: var(--fg);
@@ -399,16 +430,16 @@ body.theme-light {
 .pillars-section .rail {
   position: absolute;
   inset: 0;
-  width: 400vw;
+  width: 400%;
   height: 100%;
   display: flex;
   z-index: 2;
 }
 
 .pillars-section .chapter {
-  width: 100vw;
+  width: 25%;
   height: 100%;
-  flex: 0 0 100vw;
+  flex: 0 0 25%;
   display: grid;
   align-items: center;
   padding: clamp(32px, 6vw, 120px);
@@ -796,32 +827,117 @@ body.theme-light {
 
 .about {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: clamp(4rem, 10vw, 10rem) clamp(1.5rem, 8vw, 10rem);
+  padding: calc(clamp(4rem, 10vw, 10rem) + var(--matte-safe))
+    calc(clamp(1.5rem, 8vw, 10rem) + var(--matte-safe));
   background: #fff;
   color: #000;
   --muted: rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --matte-safe: 0px;
+    --matte-inset: 0px;
+    --matte-radius: 0px;
+  }
+
+  .matte-frame {
+    display: none;
+  }
 }
 
 .about-inner {
-  max-width: 860px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  gap: clamp(2rem, 6vw, 4rem);
 }
 
-.about-inner h2 {
-  margin-top: 0.6rem;
-  font-size: clamp(2rem, 5vw, 3.3rem);
+.about-label {
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.7rem;
+  margin: 0 0 1rem;
 }
 
-.about-inner p {
-  font-size: 1.05rem;
-  line-height: 1.7;
+.about-title {
+  font-family: var(--font-head);
+  font-size: clamp(3.2rem, 9vw, 7.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.about-lead {
+  font-size: clamp(1.1rem, 2.1vw, 1.35rem);
+  line-height: 1.65;
+  margin: 1.2rem 0 0;
+  max-width: 70ch;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.about-body {
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.about-contact {
+  font-size: clamp(1rem, 1.6vw, 1.1rem);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.about-contact a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.about-portraits {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.6rem);
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.about-portrait {
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.about-portrait img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  filter: grayscale(100%);
+}
+
+@media (max-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-title {
+    line-height: 1.02;
+  }
 }
 
 .site-footer {
   background: #111;
   color: #f5f5f5;
-  padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 8vw, 6rem) 0;
+  padding: calc(clamp(3rem, 8vw, 6rem) + var(--matte-safe))
+    calc(clamp(1.5rem, 8vw, 6rem) + var(--matte-safe)) 0;
 }
 
 .footer-inner {
@@ -864,34 +980,12 @@ body.theme-light {
   font-family: var(--font-accent);
   font-size: clamp(4rem, 16vw, 12rem);
   letter-spacing: 0.08em;
-  padding: clamp(2rem, 6vw, 4rem) 0 clamp(3rem, 8vw, 5rem);
+  padding: clamp(2rem, 6vw, 4rem) 0 calc(clamp(3rem, 8vw, 5rem) + var(--matte-safe));
 }
 
 .footer-marquee span {
   display: block;
   line-height: 0.85;
-}
-
-.stats {
-  margin-top: 2.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-}
-
-.stat-value {
-  font-family: var(--font-head);
-  font-weight: 500;
-  font-size: 2.2rem;
-  display: block;
-}
-
-.stat-label {
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.7rem;
-  font-family: var(--font-body);
-  font-weight: 300;
 }
 
 @media (max-width: 768px) {

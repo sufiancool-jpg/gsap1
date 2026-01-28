@@ -7,8 +7,6 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
 window.gsap = gsap;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-// fullscreenwebgl: set to false to revert to the previous non-WebGL background.
-const enableFullscreenWebGL = true;
 
 const smoother = ScrollSmoother.create({
   wrapper: "#smooth-wrapper",
@@ -47,6 +45,55 @@ const hideHeaderNow = () => {
     ease: "power2.out",
   });
 };
+const matteRoot = document.documentElement;
+let matteInset = 0;
+let matteAllowed = true;
+let matteEnabled = false;
+const matteMq = window.matchMedia("(max-width: 700px)");
+const enableMatte = (on) => {
+  matteEnabled = on && matteAllowed;
+  matteRoot.classList.toggle("matte-on", matteEnabled);
+};
+const setMatteState = ({ inset, radius }) => {
+  if (!matteAllowed) {
+    gsap.set(matteRoot, {
+      "--matte-safe": "0px",
+      "--matte-inset": "0px",
+      "--matte-radius": "0px",
+    });
+    return;
+  }
+  const nextInset = Number(inset);
+  if (!Number.isNaN(nextInset) && nextInset !== matteInset) {
+    matteInset = nextInset;
+    gsap.set(matteRoot, {
+      "--matte-safe": `${nextInset}px`,
+      "--matte-inset": `${nextInset}px`,
+    });
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }
+  if (radius != null) {
+    gsap.to(matteRoot, {
+      "--matte-radius": `${radius}px`,
+      duration: 0.4,
+      ease: "power2.out",
+      overwrite: true,
+    });
+  }
+};
+const updateMatteAllowance = () => {
+  matteAllowed = !matteMq.matches;
+  if (!matteAllowed) {
+    enableMatte(false);
+    setMatteState({ inset: 0, radius: 0 });
+  }
+};
+if (matteMq && matteMq.addEventListener) {
+  matteMq.addEventListener("change", updateMatteAllowance);
+}
+updateMatteAllowance();
+enableMatte(false);
+setMatteState({ inset: 0, radius: 0 });
 const setThemeLight = () => {
   if (body) body.classList.add("theme-light");
 };
@@ -77,9 +124,9 @@ const computeLogoTarget = () => {
   brandRect = brand.getBoundingClientRect();
   scale = brandRect.height / logoRect.height;
   logoTarget = {
-    x: brandRect.left - logoRect.left,
-    y: brandRect.top - logoRect.top,
-    scale,
+    x: Math.round(brandRect.left - logoRect.left),
+    y: Math.round(brandRect.top - logoRect.top),
+    scale: Number(scale.toFixed(4)),
   };
   if (header) {
     gsap.set(header, { y: headerY });
@@ -201,6 +248,10 @@ if (logo) {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(runLogoIntro);
     setTimeout(runLogoIntro, 1200);
+    document.fonts.ready.then(() => {
+      computeLogoTarget();
+      ScrollTrigger.refresh();
+    });
   } else {
     window.addEventListener("load", runLogoIntro, { once: true });
   }
@@ -311,6 +362,23 @@ navButtons.forEach((button) => {
   window.addEventListener("blur", resetFill);
 });
 
+const stageSection = document.querySelector(".stage");
+if (stageSection) {
+  ScrollTrigger.create({
+    trigger: stageSection,
+    start: "top top",
+    end: "bottom top",
+    onEnter: () => {
+      enableMatte(false);
+      setMatteState({ inset: 0, radius: 0 });
+    },
+    onEnterBack: () => {
+      enableMatte(false);
+      setMatteState({ inset: 0, radius: 0 });
+    },
+  });
+}
+
 const aboutLink = document.querySelector('a[href="#about"]');
 const aboutSection = document.querySelector("#about");
 if (aboutLink && aboutSection) {
@@ -350,6 +418,19 @@ if (aboutSection) {
     start: "top 80%",
     onEnter: showHeaderNow,
     onEnterBack: showHeaderNow,
+  });
+
+  ScrollTrigger.create({
+    trigger: aboutSection,
+    start: "top 70%",
+    onEnter: () => {
+      enableMatte(true);
+      setMatteState({ inset: 28, radius: 26 });
+    },
+    onEnterBack: () => {
+      enableMatte(true);
+      setMatteState({ inset: 28, radius: 26 });
+    },
   });
 }
 
@@ -688,8 +769,10 @@ if (pillarsSection && pillarsRail) {
   const designH = 900;
 
   const updateScale = () => {
-    const scale = Math.min(1, window.innerWidth / designW, window.innerHeight / designH);
-    const padX = Math.max(0, (window.innerWidth - designW) / 2);
+    const availableW = pillarsSection.clientWidth || window.innerWidth;
+    const availableH = pillarsSection.clientHeight || window.innerHeight;
+    const scale = Math.min(1, availableW / designW, availableH / designH);
+    const padX = Math.max(0, (availableW - designW) / 2);
     pillarsSection.style.setProperty("--scale", scale.toFixed(3));
     pillarsSection.style.setProperty("--padX", `${padX.toFixed(0)}px`);
   };
@@ -730,8 +813,9 @@ if (pillarsSection && pillarsRail) {
 
   updateTheme(0);
 
-  const getScrollDistance = () => window.innerHeight * 3;
-  const getRailShift = () => window.innerWidth * 3;
+  const getScrollDistance = () =>
+    Math.max(pillarsSection.clientHeight, pillarsSection.clientWidth) * 3;
+  const getRailShift = () => pillarsSection.clientWidth * 3;
 
   gsap.to(pillarsRail, {
     x: () => -getRailShift(),
@@ -747,6 +831,19 @@ if (pillarsSection && pillarsRail) {
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         targetProgress = self.progress;
+      },
+      onEnter: () => {
+        setThemeLight();
+        enableMatte(true);
+        setMatteState({ inset: 28, radius: 22 });
+      },
+      onEnterBack: () => {
+        setThemeLight();
+        enableMatte(true);
+        setMatteState({ inset: 28, radius: 22 });
+      },
+      onLeaveBack: () => {
+        setThemeDark();
       },
       onToggle: (self) => {
         if (self.isActive) {
@@ -791,8 +888,10 @@ if (pillarsSection && pillarsRail) {
   const resizePillars = () => {
     updateScale();
     if (renderer && camera) {
-      renderer.setSize(window.innerWidth, window.innerHeight, false);
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const width = pillarsSection.clientWidth || window.innerWidth;
+      const height = pillarsSection.clientHeight || window.innerHeight;
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
     }
     ScrollTrigger.refresh();
@@ -940,533 +1039,36 @@ if (footer) {
     onEnter: setThemeDark,
     onLeaveBack: setThemeLight,
   });
+
+  ScrollTrigger.create({
+    trigger: footer,
+    start: "top 85%",
+    onEnter: () => {
+      enableMatte(true);
+      setMatteState({ inset: 28, radius: 30 });
+    },
+    onEnterBack: () => {
+      enableMatte(true);
+      setMatteState({ inset: 28, radius: 30 });
+    },
+  });
 }
 
-gsap.from(".about-inner", {
-  opacity: 0,
-  y: 80,
-  rotateX: 10,
-  transformOrigin: "center top",
-  scrollTrigger: {
-    trigger: ".about",
-    start: "top 70%",
-    end: "top 40%",
-    scrub: true,
-  },
-});
-
-const initFullscreenWebGL = () => {
-  if (!enableFullscreenWebGL) return;
-  const canvas = document.querySelector("#webgl-bg");
-  if (!canvas) return;
-
-  const gl = canvas.getContext("webgl2", {
-    alpha: true,
-    antialias: false,
-    premultipliedAlpha: false,
+const aboutItems = gsap.utils.toArray(".about [data-animate]");
+if (aboutItems.length) {
+  gsap.from(aboutItems, {
+    y: 40,
+    autoAlpha: 0,
+    duration: 0.9,
+    ease: "power2.out",
+    stagger: 0.12,
+    scrollTrigger: {
+      trigger: ".about",
+      start: "top 70%",
+      toggleActions: "play none none reverse",
+    },
   });
-  if (!gl) return;
-
-  const useFloat = !!gl.getExtension("EXT_color_buffer_float");
-  if (useFloat) {
-    gl.getExtension("OES_texture_float_linear");
-  }
-
-  const createShader = (type, source) => {
-    const shader = gl.createShader(type);
-    if (!shader) return null;
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.warn(gl.getShaderInfoLog(shader));
-      gl.deleteShader(shader);
-      return null;
-    }
-    return shader;
-  };
-
-  const createProgram = (vsSource, fsSource) => {
-    const vertexShader = createShader(gl.VERTEX_SHADER, vsSource);
-    const fragmentShader = createShader(gl.FRAGMENT_SHADER, fsSource);
-    if (!vertexShader || !fragmentShader) return null;
-    const program = gl.createProgram();
-    if (!program) return null;
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.warn(gl.getProgramInfoLog(program));
-      gl.deleteProgram(program);
-      return null;
-    }
-    gl.deleteShader(vertexShader);
-    gl.deleteShader(fragmentShader);
-    return program;
-  };
-
-  const simVertex = `#version 300 es
-    precision highp float;
-    out vec2 vUv;
-    void main() {
-      vec2 pos = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
-      vUv = pos * 0.5;
-      gl_Position = vec4(pos * 2.0 - 1.0, 0.0, 1.0);
-    }
-  `;
-
-  const simFragment = `#version 300 es
-    precision highp float;
-    in vec2 vUv;
-    out vec4 fragColor;
-    uniform sampler2D uState;
-    uniform vec2 uTexel;
-    uniform vec2 uSplatPos;
-    uniform vec2 uSplatDir;
-    uniform float uSplatStrength;
-    uniform float uSplatRadius;
-    uniform float uDamping;
-    uniform float uUseFloat;
-
-    vec2 decode(vec2 v) {
-      if (uUseFloat < 0.5) {
-        return v * 2.0 - 1.0;
-      }
-      return v;
-    }
-
-    vec2 encode(vec2 v) {
-      if (uUseFloat < 0.5) {
-        return v * 0.5 + 0.5;
-      }
-      return v;
-    }
-
-    void main() {
-      vec2 state = decode(texture(uState, vUv).rg);
-      float h = state.x;
-      float v = state.y;
-
-      float hL = decode(texture(uState, vUv - vec2(uTexel.x, 0.0)).rg).x;
-      float hR = decode(texture(uState, vUv + vec2(uTexel.x, 0.0)).rg).x;
-      float hU = decode(texture(uState, vUv + vec2(0.0, uTexel.y)).rg).x;
-      float hD = decode(texture(uState, vUv - vec2(0.0, uTexel.y)).rg).x;
-
-      float lap = hL + hR + hU + hD - 4.0 * h;
-      v += lap * 0.5;
-      v *= uDamping;
-      h += v;
-
-      vec2 diff = vUv - uSplatPos - uSplatDir;
-      float dist = dot(diff, diff);
-      float splat = exp(-dist / (uSplatRadius * uSplatRadius));
-      h += splat * uSplatStrength;
-      v += splat * uSplatStrength * 0.35;
-
-      fragColor = vec4(encode(vec2(h, v)), 0.0, 1.0);
-    }
-  `;
-
-  const renderVertex = `#version 300 es
-    precision highp float;
-    uniform sampler2D uHeight;
-    uniform vec2 uGrid;
-    uniform float uHeightAmp;
-    uniform float uPointSize;
-    uniform vec2 uRevealPos;
-    uniform float uRevealRadius;
-    uniform float uRevealSoftness;
-    uniform float uTime;
-    uniform float uMotionScale;
-    uniform float uUseFloat;
-    out float vHeight;
-    out vec2 vUv;
-    out float vReveal;
-
-    void main() {
-      float idx = float(gl_VertexID);
-      float ix = mod(idx, uGrid.x);
-      float iy = floor(idx / uGrid.x);
-      vUv = vec2(ix / (uGrid.x - 1.0), iy / (uGrid.y - 1.0));
-
-      vec2 state = texture(uHeight, vUv).rg;
-      if (uUseFloat < 0.5) {
-        state = state * 2.0 - 1.0;
-      }
-      float h = state.x;
-
-      vec2 pos = vUv * 2.0 - 1.0;
-      float wave1 = sin(vUv.x * 12.0 + uTime * 0.6);
-      float wave2 = sin(vUv.y * 9.0 + uTime * 0.4 + vUv.x * 2.0);
-      float wave3 = sin((vUv.x + vUv.y) * 7.0 + uTime * 0.7);
-      float baseWave = (wave1 * 0.007 + wave2 * 0.006 + wave3 * 0.004) * uMotionScale;
-      pos.y += baseWave;
-      pos.x += baseWave * 0.18;
-      pos.y += h * uHeightAmp;
-      gl_Position = vec4(pos, 0.0, 1.0);
-
-      vHeight = h;
-      float safeRadius = max(uRevealRadius, 0.0001);
-      float dist = distance(vUv, uRevealPos);
-      float softness = max(uRevealSoftness, 0.05);
-      float reveal = exp(-dist * dist / (safeRadius * safeRadius * softness));
-      reveal *= step(0.0001, uRevealRadius);
-      vReveal = reveal;
-
-      float size = uPointSize * (1.15 + h * 1.0 + reveal * 0.6);
-      gl_PointSize = max(1.0, size);
-    }
-  `;
-
-  const renderFragment = `#version 300 es
-    precision highp float;
-    in float vHeight;
-    in vec2 vUv;
-    in float vReveal;
-    uniform vec3 uColor;
-    uniform float uVisibility;
-    uniform vec2 uRevealPos;
-    uniform float uRevealRadius;
-    uniform float uRevealSoftness;
-    out vec4 fragColor;
-
-    void main() {
-      vec2 p = gl_PointCoord - vec2(0.5);
-      float d = length(p);
-      float core = smoothstep(0.5, 0.0, d);
-      float halo = smoothstep(0.5, 0.15, d);
-
-      float vignette = smoothstep(0.95, 0.25, length(vUv - vec2(0.5)));
-      float topGlow = exp(-dot(vUv - vec2(0.5, 0.12), vUv - vec2(0.5, 0.12)) * 8.0);
-      float heightBoost = 1.0 + vHeight * 0.85;
-      float brightness = mix(0.4, 1.25, topGlow);
-      brightness *= mix(0.8, 1.35, vReveal);
-
-      vec3 color = uColor * brightness * heightBoost;
-      color.r += max(0.0, vHeight) * 0.1;
-      color += uColor * halo * 0.1;
-
-      float safeRadius = max(uRevealRadius, 0.0001);
-      float dist = distance(vUv, uRevealPos);
-      float softness = max(uRevealSoftness, 0.05);
-      float reveal = exp(-dist * dist / (safeRadius * safeRadius * softness));
-      reveal *= step(0.0001, uRevealRadius);
-
-      float alpha = core * vignette * uVisibility * reveal;
-      fragColor = vec4(color, alpha);
-    }
-  `;
-
-  const simProgram = createProgram(simVertex, simFragment);
-  const renderProgram = createProgram(renderVertex, renderFragment);
-  if (!simProgram || !renderProgram) return;
-
-  const simUniforms = {
-    state: gl.getUniformLocation(simProgram, "uState"),
-    texel: gl.getUniformLocation(simProgram, "uTexel"),
-    splatPos: gl.getUniformLocation(simProgram, "uSplatPos"),
-    splatDir: gl.getUniformLocation(simProgram, "uSplatDir"),
-    splatStrength: gl.getUniformLocation(simProgram, "uSplatStrength"),
-    splatRadius: gl.getUniformLocation(simProgram, "uSplatRadius"),
-    damping: gl.getUniformLocation(simProgram, "uDamping"),
-    useFloat: gl.getUniformLocation(simProgram, "uUseFloat"),
-  };
-
-  const renderUniforms = {
-    height: gl.getUniformLocation(renderProgram, "uHeight"),
-    grid: gl.getUniformLocation(renderProgram, "uGrid"),
-    heightAmp: gl.getUniformLocation(renderProgram, "uHeightAmp"),
-    pointSize: gl.getUniformLocation(renderProgram, "uPointSize"),
-    color: gl.getUniformLocation(renderProgram, "uColor"),
-    visibility: gl.getUniformLocation(renderProgram, "uVisibility"),
-    revealPos: gl.getUniformLocation(renderProgram, "uRevealPos"),
-    revealRadius: gl.getUniformLocation(renderProgram, "uRevealRadius"),
-    revealSoftness: gl.getUniformLocation(renderProgram, "uRevealSoftness"),
-    time: gl.getUniformLocation(renderProgram, "uTime"),
-    motionScale: gl.getUniformLocation(renderProgram, "uMotionScale"),
-    useFloat: gl.getUniformLocation(renderProgram, "uUseFloat"),
-  };
-
-  const quadVao = gl.createVertexArray();
-  const pointsVao = gl.createVertexArray();
-
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const lerp = (a, b, t) => a + (b - a) * t;
-
-  const createTexture = (width, height) => {
-    const texture = gl.createTexture();
-    if (!texture) return null;
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    const internalFormat = useFloat ? gl.RGBA16F : gl.RGBA8;
-    const format = gl.RGBA;
-    const type = useFloat ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE;
-    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, null);
-    return texture;
-  };
-
-  const createFbo = (texture) => {
-    const fbo = gl.createFramebuffer();
-    if (!fbo || !texture) return null;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    return fbo;
-  };
-
-  let simWidth = 0;
-  let simHeight = 0;
-  let simA = null;
-  let simB = null;
-  let fboA = null;
-  let fboB = null;
-  let current = null;
-  let next = null;
-  let gridX = 0;
-  let gridY = 0;
-  let pointCount = 0;
-
-  const rebuildSimulation = (width, height) => {
-    simWidth = width;
-    simHeight = height;
-    simA = createTexture(simWidth, simHeight);
-    simB = createTexture(simWidth, simHeight);
-    fboA = createFbo(simA);
-    fboB = createFbo(simB);
-    current = { texture: simA, fbo: fboA };
-    next = { texture: simB, fbo: fboB };
-  };
-
-  const pointer = {
-    active: false,
-    inside: false,
-    x: 0.5,
-    y: 0.5,
-    targetX: 0.5,
-    targetY: 0.5,
-    dirX: 0,
-    dirY: 0,
-    speed: 0,
-    visible: 0,
-    revealRadius: 0,
-    clickBoost: 0,
-    clickTime: 0,
-    lastX: 0,
-    lastY: 0,
-    lastTime: performance.now(),
-  };
-
-  const updatePointer = (event) => {
-    if (!event.isPrimary) return;
-    if (event.target && event.target.closest && event.target.closest(".logo")) {
-      pointer.active = false;
-      pointer.inside = false;
-      return;
-    }
-    const rect = canvas.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = 1 - (event.clientY - rect.top) / rect.height;
-    const inside = x >= 0 && x <= 1 && y >= 0 && y <= 1;
-    pointer.inside = inside;
-    pointer.active = inside;
-    if (!inside) return;
-    pointer.targetX = clamp(x, 0, 1);
-    pointer.targetY = clamp(y, 0, 1);
-
-    const now = performance.now();
-    const dt = Math.max(16, now - pointer.lastTime);
-    const dx = event.clientX - pointer.lastX;
-    const dy = event.clientY - pointer.lastY;
-    pointer.lastX = event.clientX;
-    pointer.lastY = event.clientY;
-    pointer.lastTime = now;
-    const distance = Math.hypot(dx, dy);
-    const speed = Math.min(distance / dt, 1.6);
-    pointer.speed = speed;
-    if (distance > 0.001) {
-      pointer.dirX = dx / distance;
-      pointer.dirY = -dy / distance;
-    }
-  };
-
-  const clearPointer = () => {
-    pointer.active = false;
-    pointer.inside = false;
-  };
-
-  const releasePointer = () => {
-    pointer.active = pointer.inside;
-  };
-
-  const triggerClick = (event) => {
-    if (!event.isPrimary) return;
-    pointer.clickBoost = 1;
-    pointer.clickTime = performance.now();
-    pointer.speed = Math.max(pointer.speed, 0.6);
-    updatePointer(event);
-  };
-
-  window.addEventListener("pointermove", updatePointer, { passive: true });
-  window.addEventListener("pointerdown", triggerClick, { passive: true });
-  window.addEventListener("pointerup", releasePointer, { passive: true });
-  window.addEventListener("pointerleave", clearPointer, { passive: true });
-  window.addEventListener("pointercancel", clearPointer, { passive: true });
-
-  const resize = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.floor(width * dpr));
-    canvas.height = Math.max(1, Math.floor(height * dpr));
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    gl.viewport(0, 0, canvas.width, canvas.height);
-
-    const aspect = width / height;
-    gridY = 230;
-    gridX = Math.round(gridY * aspect);
-    gridX = clamp(gridX, 180, 520);
-    pointCount = gridX * gridY;
-
-    const simBase = 256;
-    let simW = aspect >= 1 ? Math.round(simBase * aspect) : simBase;
-    let simH = aspect >= 1 ? simBase : Math.round(simBase / aspect);
-    simW = clamp(simW, 192, 512);
-    simH = clamp(simH, 192, 512);
-    rebuildSimulation(simW, simH);
-
-    gl.useProgram(renderProgram);
-    gl.uniform2f(renderUniforms.grid, gridX, gridY);
-    gl.uniform1f(renderUniforms.heightAmp, prefersReducedMotion ? 0.16 : 0.28);
-    gl.uniform1f(renderUniforms.pointSize, 5.2 * dpr);
-    gl.uniform3f(renderUniforms.color, 0.6, 0.95, 0.9);
-    gl.uniform1f(renderUniforms.useFloat, useFloat ? 1 : 0);
-    gl.uniform1f(renderUniforms.visibility, 0);
-    gl.uniform2f(renderUniforms.revealPos, 0.5, 0.5);
-    gl.uniform1f(renderUniforms.revealRadius, 0);
-    gl.uniform1f(renderUniforms.revealSoftness, 3.0);
-    gl.uniform1f(renderUniforms.time, 0);
-    gl.uniform1f(renderUniforms.motionScale, 1);
-  };
-
-  gl.disable(gl.CULL_FACE);
-  gl.disable(gl.DEPTH_TEST);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-  gl.useProgram(simProgram);
-  gl.uniform1i(simUniforms.state, 0);
-  gl.uniform1f(simUniforms.damping, prefersReducedMotion ? 0.992 : 0.984);
-  gl.uniform1f(simUniforms.useFloat, useFloat ? 1 : 0);
-
-  gl.useProgram(renderProgram);
-  gl.uniform1i(renderUniforms.height, 0);
-
-  resize();
-  window.addEventListener("resize", resize);
-
-  let lastTime = performance.now();
-  const baseStrength = 0.004;
-  const speedStrength = 0.12;
-  const baseRadius = 0.05;
-  const revealBase = 0.9;
-  const revealBoost = 0.2;
-  const idleStrength = 0.0025;
-  const idleRadius = 0.05;
-  const idleReveal = 1.4;
-  const idleVisibility = 0.45;
-
-  const frame = (time) => {
-    lastTime = time;
-
-    pointer.x = lerp(pointer.x, pointer.targetX, 0.14);
-    pointer.y = lerp(pointer.y, pointer.targetY, 0.14);
-    pointer.speed = lerp(pointer.speed, 0, 0.06);
-    const t = time * 0.001;
-    const idlePulse = 0.55 + 0.45 * (Math.sin(t * 0.55) * 0.5 + 0.5);
-    const activePulse = 0.92 + 0.08 * Math.sin(t * 0.6);
-    const idleMotion = prefersReducedMotion ? 0 : 1;
-    const targetVisibility = pointer.active
-      ? 0.95
-      : idleVisibility * (0.85 + 0.15 * idlePulse) * idleMotion;
-    pointer.visible = lerp(pointer.visible, targetVisibility, 0.07);
-    const targetReveal = pointer.active
-      ? revealBase + pointer.speed * revealBoost
-      : idleReveal * idlePulse * idleMotion;
-    pointer.revealRadius = lerp(pointer.revealRadius, targetReveal, 0.08);
-
-    const motionScale = prefersReducedMotion ? 0.35 : 1;
-    pointer.clickBoost = lerp(pointer.clickBoost, 0, 0.04);
-    const clickPhase = Math.sin(((time - pointer.clickTime) / 1000) * 6.5);
-    const clickWave = pointer.active
-      ? pointer.clickBoost * (0.6 + 0.4 * clickPhase)
-      : 0;
-
-    const strength = pointer.active
-      ? (baseStrength + pointer.speed * speedStrength) * motionScale * activePulse + clickWave * 0.08
-      : idleStrength * idlePulse * idleMotion;
-    const radius = pointer.active
-      ? baseRadius + pointer.speed * 0.05 + 0.01 * activePulse + clickWave * 0.18
-      : idleRadius;
-    const drag = pointer.speed * 0.11;
-    const visibility = Math.min(1, pointer.visible);
-    const heightAmp =
-      (prefersReducedMotion ? 0.12 : 0.2) + pointer.speed * (prefersReducedMotion ? 0.05 : 0.16);
-    const renderMotionScale = pointer.active ? 0.4 : 1.0;
-    const idleX = 0.5 + Math.cos(t * 0.22) * 0.08;
-    const idleY = 0.5 + Math.sin(t * 0.18) * 0.07;
-
-    gl.disable(gl.DEPTH_TEST);
-    gl.bindVertexArray(quadVao);
-    gl.useProgram(simProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, next.fbo);
-    gl.viewport(0, 0, simWidth, simHeight);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, current.texture);
-    gl.uniform2f(simUniforms.texel, 1 / simWidth, 1 / simHeight);
-    gl.uniform2f(
-      simUniforms.splatPos,
-      pointer.active ? pointer.x : idleX,
-      pointer.active ? pointer.y : idleY
-    );
-    gl.uniform2f(simUniforms.splatDir, pointer.dirX * drag, pointer.dirY * drag);
-    gl.uniform1f(simUniforms.splatStrength, strength);
-    gl.uniform1f(simUniforms.splatRadius, radius);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-    const temp = current;
-    current = next;
-    next = temp;
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.useProgram(renderProgram);
-    gl.bindVertexArray(pointsVao);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, current.texture);
-    gl.uniform1f(renderUniforms.visibility, visibility);
-    gl.uniform2f(
-      renderUniforms.revealPos,
-      pointer.active ? pointer.x : idleX,
-      pointer.active ? pointer.y : idleY
-    );
-    gl.uniform1f(renderUniforms.revealRadius, pointer.revealRadius);
-    gl.uniform1f(renderUniforms.heightAmp, heightAmp);
-    gl.uniform1f(renderUniforms.time, time * 0.001);
-    gl.uniform1f(renderUniforms.motionScale, renderMotionScale);
-    gl.drawArrays(gl.POINTS, 0, pointCount);
-
-    requestAnimationFrame(frame);
-  };
-
-  requestAnimationFrame(frame);
-};
-
-initFullscreenWebGL();
+}
 
 window.addEventListener("load", () => {
   ScrollTrigger.refresh();

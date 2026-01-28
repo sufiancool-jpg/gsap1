@@ -25,7 +25,6 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <canvas class="webgl-bg" id="webgl-bg" aria-hidden="true"></canvas>
     <header class="site-header" aria-label="Primary">
       <div class="site-brand">Urbanoise</div>
       <nav class="nav-links">
@@ -39,6 +38,7 @@
         </a>
       </nav>
     </header>
+    <div class="matte-frame" aria-hidden="true"></div>
     <div id="smooth-wrapper">
       <div id="smooth-content">
         <section class="stage" id="stage" aria-label="Urbanoise intro">
@@ -132,25 +132,41 @@
 
         <section class="about" id="about" aria-label="About Urbanoise">
           <div class="about-inner">
-            <p class="eyebrow">About us</p>
-            <h2>We record the city the way it feels at midnight.</h2>
-            <p>
-              Urbanoise is a collective of filmmakers, sound designers, and street photographers
-              capturing raw urban texture. We chase reflections, human rhythm, and that hum
-              you hear when the city breathes.
-            </p>
-            <div class="stats">
-              <div class="stat">
-                <span class="stat-value">42</span>
-                <span class="stat-label">Collaborators</span>
+            <div class="about-hero">
+              <p class="about-label eyebrow" data-animate>About us</p>
+              <h2 class="about-title" data-animate>We are Urbanoise.</h2>
+              <p class="about-lead" data-animate>
+                A Berlin-based creative studio. We work at the intersection of film, photography,
+                media, and strategy &mdash; where ideas are shaped, not rushed.
+              </p>
+            </div>
+            <div class="about-grid">
+              <div class="about-col about-col-left" data-animate>
+                <p class="about-body">
+                  We collaborate with brands, institutions, and teams who value clarity over
+                  volume, and longevity over trends. Experience matters. And ours is built through
+                  years of hands-on production, problem-solving, and real-world delivery &mdash; not
+                  theory. To put it simply, we help ideas find their strongest form.
+                </p>
               </div>
-              <div class="stat">
-                <span class="stat-value">98</span>
-                <span class="stat-label">Short reels</span>
-              </div>
-              <div class="stat">
-                <span class="stat-value">8</span>
-                <span class="stat-label">Cities filmed</span>
+              <div class="about-col about-col-right">
+                <p class="about-contact" data-animate>
+                  We are always happy to talk and meet new people. Contact us.
+                </p>
+                <p class="about-contact" data-animate>
+                  Give us a call
+                  <a href="tel:+13235550192">+1 (323) 555 0192</a>
+                  or e-mail
+                  <a href="mailto:info@urbanoise.com">info@urbanoise.com</a>
+                </p>
+                <div class="about-portraits" data-animate>
+                  <figure class="about-portrait">
+                    <img src="Photos/suf.jpg" alt="Sufian Ararah" loading="lazy">
+                  </figure>
+                  <figure class="about-portrait">
+                    <img src="Photos/rokas.jpg" alt="Rokas" loading="lazy">
+                  </figure>
+                </div>
               </div>
             </div>
           </div>
