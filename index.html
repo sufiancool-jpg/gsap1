@@ -71,63 +71,62 @@
           </div>
         </section>
 
-        <section
-          class="horizontal-scroll-section"
-          id="horiz"
-          aria-label="Urbanoise horizontal scroll"
-        >
-          <div class="media-window" id="slideshow1"></div>
-          <div class="horiz-parallax" aria-hidden="true"></div>
-          <div class="horizontal-scroll-container">
-            <article class="panel panel-1">
-              <div class="panel-copy panel-copy-center film-copy">
-                <p class="eyebrow sr-only">Page 2</p>
-                <div class="film-hero">
-                  <p>We make films, not content.</p>
-                  <p>Narrative-driven work with a cinematic backbone.</p>
+        <section class="pillars-section" id="pillars" aria-label="Urbanoise pillars">
+          <div class="bg" aria-hidden="true">
+            <canvas id="bgCanvas"></canvas>
+          </div>
+          <nav class="status" aria-hidden="true">
+            <div class="status__item is-active" data-i="0"><span class="dot"></span>FILM</div>
+            <div class="status__item" data-i="1"><span class="dot"></span>PHOTOGRAPHY</div>
+            <div class="status__item" data-i="2"><span class="dot"></span>MEDIA CAMPAIGNS</div>
+            <div class="status__item" data-i="3"><span class="dot"></span>CONSULTING</div>
+          </nav>
+          <div class="rail" id="rail">
+            <section class="chapter chapter--p1">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  Narrative-driven work with a cinematic backbone.<br>From concept to final cut,
+                  we focus on stories that feel intentional, human, and lasting &mdash; not
+                  disposable.
+                </p>
+                <h1>WE MAKE FILMS,<br>NOT CONTENT.</h1>
+              </div>
+            </section>
+            <section class="chapter chapter--p2">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  Commercial, editorial, and artistic photography built around clarity and mood.
+                  Every frame is composed to communicate &mdash; not decorate.
+                </p>
+                <h1 class="p2-title" id="p2Title">IMAGES THAT<br>CARRY WEIGHT.</h1>
+                <div class="p2-slideshow" id="p2Slideshow" aria-hidden="true">
+                  <img id="p2SlideImg" alt="">
                 </div>
-                <p class="film-sub">
-                  From concept to final cut, we focus on stories that feel intentional, human, and
-                  lasting — not disposable.
-                </p>
-                <div class="film-tail">
-                  <p class="film-detail">Strategy-led filmmaking.</p>
-                  <p class="film-detail">Crafted visuals.</p>
-                  <p class="film-detail">Films that stay relevant beyond the campaign.</p>
-                </div>
               </div>
-            </article>
-            <article class="panel panel-2">
-              <div class="panel-copy panel-copy-center">
-                <p class="eyebrow">Page 3</p>
-                <h2>Letters that breathe.</h2>
-                <p>
-                  Minimal typography, generous spacing, and a calm rhythm that keeps the story
-                  centered.
+            </section>
+            <section class="chapter chapter--p3">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  We design media campaigns that connect strategy, platforms, and audiences
+                  &mdash; without noise. From launch concepts to long-tail distribution, everything
+                  is intentional.
                 </p>
+                <h1>IDEAS,STRUCTURED TO TRAVEL.</h1>
               </div>
-            </article>
-            <article class="panel panel-3">
-              <div class="panel-copy panel-copy-left"></div>
-            </article>
-            <article class="panel panel-4">
-              <div class="panel-copy panel-copy-right panel-copy-overlay">
-                <h2>A window from the right.</h2>
-                <p>
-                  This area is a window that comes up from the right as we continue scrolling.
+            </section>
+            <section class="chapter chapter--p4">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  Years in production become a practical compass that directs teams, budgets, and
+                  outcomes.
                 </p>
+                <h1>EXPERIENCE,<br>TURNED INTO DIRECTION.</h1>
               </div>
-            </article>
-            <article class="panel panel-5">
-              <div class="panel-copy panel-copy-right">
-                <p class="eyebrow">Page 5</p>
-                <h2>Type turns into a field.</h2>
-                <p>
-                  The frame expands until it holds the whole scene, then releases us back to the
-                  vertical story.
-                </p>
-              </div>
-            </article>
+            </section>
           </div>
         </section>
 
@@ -191,6 +190,7 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
