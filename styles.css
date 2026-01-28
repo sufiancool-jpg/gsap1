@@ -1,6 +1,7 @@
 :root {
   --bg: #000;
   --text: #fff;
+  --logo-color: var(--text);
   --muted: rgba(255, 255, 255, 0.6);
   --nav-base: #fff;
   --nav-fill: #fff;
@@ -117,7 +118,7 @@ body.theme-light {
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  color: var(--text);
+  color: var(--logo-color, var(--text));
   pointer-events: none;
 }
 
@@ -219,6 +220,7 @@ body.theme-light {
   pointer-events: auto;
   display: inline-grid;
   place-items: center;
+  color: var(--logo-color, var(--text));
 }
 
 .logo > span {
@@ -829,20 +831,69 @@ body.theme-light {
   min-height: 100vh;
   padding: calc(clamp(4rem, 10vw, 10rem) + var(--matte-safe))
     calc(clamp(1.5rem, 8vw, 10rem) + var(--matte-safe));
-  background: #fff;
-  color: #000;
-  --muted: rgba(0, 0, 0, 0.6);
+  background: #000;
+  color: #fff;
+  --muted: rgba(255, 255, 255, 0.65);
   box-sizing: border-box;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1024px) {
   :root {
     --matte-safe: 0px;
     --matte-inset: 0px;
     --matte-radius: 0px;
   }
 
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  #smooth-wrapper,
+  #smooth-content {
+    overflow-x: clip;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+  }
+
+  .site-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
   .matte-frame {
+    display: none;
+  }
+
+  .p2-slideshow {
+    display: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-header {
+    left: 0;
+    right: 0;
+    justify-content: center;
+  }
+
+  .site-brand {
+    width: auto;
+    text-align: center;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .pillars-section .status {
     display: none;
   }
 }
@@ -899,7 +950,7 @@ body.theme-light {
 .about-contact a {
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .about-portraits {

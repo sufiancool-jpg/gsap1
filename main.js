@@ -49,7 +49,8 @@ const matteRoot = document.documentElement;
 let matteInset = 0;
 let matteAllowed = true;
 let matteEnabled = false;
-const matteMq = window.matchMedia("(max-width: 700px)");
+const matteMq = window.matchMedia("(max-width: 1024px)");
+const phoneMq = window.matchMedia("(max-width: 700px)");
 const enableMatte = (on) => {
   matteEnabled = on && matteAllowed;
   matteRoot.classList.toggle("matte-on", matteEnabled);
@@ -94,6 +95,7 @@ if (matteMq && matteMq.addEventListener) {
 updateMatteAllowance();
 enableMatte(false);
 setMatteState({ inset: 0, radius: 0 });
+const isPhone = () => (phoneMq ? phoneMq.matches : false);
 const setThemeLight = () => {
   if (body) body.classList.add("theme-light");
 };
@@ -408,9 +410,9 @@ if (aboutSection) {
   ScrollTrigger.create({
     trigger: aboutSection,
     start: "top 70%",
-    onEnter: setThemeLight,
-    onEnterBack: setThemeLight,
-    onLeaveBack: setThemeDark,
+    onEnter: setThemeDark,
+    onEnterBack: setThemeDark,
+    onLeaveBack: setThemeLight,
   });
 
   ScrollTrigger.create({
@@ -788,6 +790,7 @@ if (pillarsSection && pillarsRail) {
   let lastX = 0;
   let roll = 0;
 
+  let pillarsActive = false;
   const updateTheme = (progress) => {
     const idx = Math.round(progress * 3);
     pillarsDots.forEach((dot) => {
@@ -809,6 +812,14 @@ if (pillarsSection && pillarsRail) {
       darkT < 0.5 ? "rgba(0,0,0,.25)" : "rgba(255,255,255,.35)"
     );
     pillarsSection.style.setProperty("--dotOn", darkT < 0.5 ? "rgba(0,0,0,.85)" : "#ffffff");
+
+    if (pillarsActive) {
+      const logoTone = Math.round(lerpValue(11, 255, darkT));
+      matteRoot.style.setProperty(
+        "--logo-color",
+        `rgb(${logoTone}, ${logoTone}, ${logoTone})`
+      );
+    }
   };
 
   updateTheme(0);
@@ -846,10 +857,16 @@ if (pillarsSection && pillarsRail) {
         setThemeDark();
       },
       onToggle: (self) => {
+        pillarsActive = self.isActive;
         if (self.isActive) {
-          hideHeaderNow();
+          if (isPhone()) {
+            showHeaderNow();
+          } else {
+            hideHeaderNow();
+          }
         } else {
           showHeaderNow();
+          matteRoot.style.removeProperty("--logo-color");
         }
       },
     },
