@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Urbanoise – Typographic Sphere (Surface)</title>
+
+<style>
+@import url('https://fonts.cdnfonts.com/css/cabinet-grotesk');
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+@import url('https://fonts.cdnfonts.com/css/poppins');
+
+:root{
+  --bgA:#ffffff;
+  --bgB:#f2f2f2;
+  --fg:#0b0b0b;
+  --muted:rgba(0,0,0,.55);
+  --dotOff:rgba(0,0,0,.25);
+  --dotOn:rgba(0,0,0,.85);
+  --scale:1;
+  --padX:0px;
+  --font-logo:'Cabinet Grotesk', sans-serif;
+  --font-h1:'Satoshi', sans-serif;
+  --font-heading:'Satoshi', sans-serif;
+  --font-nav:'Satoshi', sans-serif;
+  --font-body:'Poppins', sans-serif;
+  --font-small:'Poppins', sans-serif;
+  --font-accent:'Tanker', sans-serif;
+}
+html,body{margin:0;padding:0;}
+body{
+  font-family: var(--font-body);
+  background: radial-gradient(1200px 700px at 20% 20%, var(--bgB), var(--bgA));
+  color:var(--fg);
+  overflow-x:hidden;
+}
+
+/* WebGL */
+.bg{position:fixed; inset:0; z-index:0; pointer-events:none;}
+canvas{width:100%; height:100%; display:block;}
+
+/* Status */
+.status{
+  position:fixed; top:48px; left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  padding:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:0;
+  z-index:5; pointer-events:none;
+  margin:0;
+}
+.status__item{
+  min-width:0;
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--font-nav);
+  font-weight:500; font-size:clamp(13px,1.15vw,20px);
+  letter-spacing:.1em; text-transform:uppercase;
+  text-align:left;
+}
+.dot{width:18px; height:18px; border-radius:999px; background:var(--dotOff);}
+
+@media (max-width:980px){
+  .status{gap:0;}
+  .status__item{font-size:clamp(12px,1.4vw,18px); letter-spacing:.08em;}
+}
+.status__item.is-active .dot{background:var(--dotOn);}
+@media (max-width:900px){
+  .status{flex-wrap:wrap; justify-content:center;}
+}
+@media (max-width:520px){
+  .status{justify-content:flex-start;}
+}
+
+/* Sideways scroll */
+.scroll-space{height:400vh;}
+.rail{
+  position:fixed; inset:0;
+  width:400vw; height:100vh;
+  display:flex; z-index:2;
+}
+.chapter{
+  width:100vw; height:100vh; flex:0 0 100vw;
+  display:grid; align-items:center;
+  padding:clamp(32px,6vw,120px);
+  position:relative;
+}
+.wrap{
+  width:min(1200px, 92vw);
+  max-width:1200px;
+  display:grid;
+  gap:18px;
+}
+.kicker{
+  font-family:var(--font-small);
+  font-weight:300;
+  font-size:12px; letter-spacing:.22em;
+  text-transform:uppercase; opacity:.6; margin:0;
+}
+h1{
+  font-family:var(--font-h1);
+  font-size:clamp(64px,8.5vw,150px);
+  line-height:.92; letter-spacing:-0.04em;
+  margin:0; font-weight:700;
+  text-transform:uppercase; max-width:14ch;
+  position:relative;
+}
+h2,h3{
+  font-family:var(--font-heading);
+  font-weight:500;
+}
+.subcopy{
+  font-family:var(--font-body);
+  font-weight:400;
+  font-size:calc(20px * var(--scale));
+  line-height:1.6;
+  opacity:1;
+  color:#000000;
+  max-width:48ch;
+  margin:0;
+}
+
+/* P2 hover slideshow */
+.p2-slideshow{
+  position:fixed;
+  width:480px;
+  height:auto;
+  overflow:hidden;
+  border-radius:0;
+  box-shadow:none;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  left:0;
+  top:0;
+  background:#e9e9e9;
+  z-index:4;
+}
+.p2-slideshow img{
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+.p2-title .front{
+  position:relative;
+  z-index:5;
+}
+.p2-title .back{
+  position:relative;
+  z-index:1;
+}
+.logo{
+  font-family:var(--font-logo);
+  font-weight:800;
+}
+.accent{
+  font-family:var(--font-accent);
+  font-weight:400;
+}
+
+/* Slide layout variations */
+.chapter:nth-child(1) .wrap{justify-self:start; text-align:left; transform:translateX(var(--padX));}
+.chapter:nth-child(2) .wrap{justify-self:end; text-align:right; transform:translateX(calc(-1 * var(--padX)));}
+.chapter:nth-child(2) h1{max-width:12ch;}
+.chapter--p2 h1{
+  margin-top:calc(-180px * var(--scale));
+  font-size:calc(122px * var(--scale));
+}
+.chapter--p2 .subcopy{
+  font-size:calc(25px * var(--scale));
+  margin-top:calc(-180px * var(--scale));
+  max-width:30ch;
+  line-height:1.35;
+  transform:translateX(calc(-360px * var(--scale)));
+}
+.chapter--p3 h1{
+  margin-top:calc(-135px * var(--scale));
+  text-align:right;
+  font-size:calc(80px * var(--scale));
+  transform:translateX(calc(-216px * var(--scale)));
+}
+.chapter--p3 .subcopy{
+  margin-top:calc(-405px * var(--scale));
+  max-width:30ch;
+  line-height:1.35;
+  transform:translateX(calc(-360px * var(--scale)));
+  text-align: left;
+}
+.chapter--p4 h1{
+  margin-top:calc(-180px * var(--scale));
+  font-size:calc(122px * var(--scale));
+}
+.chapter--p4 .subcopy{
+  color: #ffffff;
+  margin-top:calc(-90px * var(--scale));
+  max-width:30ch;
+  line-height:1.35;
+  transform:translateX(calc(-576px * var(--scale)));
+}
+.chapter:nth-child(3) .wrap{justify-self:center; text-align:center;}
+.chapter:nth-child(4) .wrap{justify-self:start; text-align:left; margin-left:0; margin-right:0; transform:translateX(var(--padX));}
+.chapter:nth-child(4) h1{max-width:12ch;}
+
+/* Pillar 01 layout */
+.chapter--p1 h1{
+  margin-top:calc(-360px * var(--scale));
+  font-size:calc(120px * var(--scale));
+  font-weight: bold;
+}
+.chapter--p1 .subcopy{
+  font-size:calc(20px * var(--scale));
+  position:absolute;
+  right:calc(0px * var(--scale));
+  bottom:auto;
+  top:50%;
+  transform:translateY(0);
+  text-align:right;
+  max-width:45ch;
+}
+
+@media (max-width:900px){
+  .chapter--p1 h1,
+  .chapter--p2 h1,
+  .chapter--p3 h1,
+  .chapter--p4 h1{
+    margin-top:0;
+    transform:none;
+    text-align:left;
+  }
+  .chapter--p1 .subcopy,
+  .chapter--p2 .subcopy,
+  .chapter--p3 .subcopy,
+  .chapter--p4 .subcopy{
+    margin-top:0;
+    transform:none;
+    position:relative;
+    right:auto;
+    top:auto;
+    text-align:left;
+  }
+  .chapter--p1 .subcopy{max-width:48ch;}
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="bg"><canvas id="bgCanvas"></canvas></div>
+
+<nav class="status">
+  <div class="status__item is-active" data-i="0"><span class="dot"></span>FILM</div>
+  <div class="status__item" data-i="1"><span class="dot"></span>PHOTOGRAPHY</div>
+  <div class="status__item" data-i="2"><span class="dot"></span>MEDIA CAMPAIGNS</div>
+  <div class="status__item" data-i="3"><span class="dot"></span>CONSULTING</div>
+</nav>
+
+<div class="rail" id="rail">
+  <section class="chapter chapter--p1">
+    <div class="wrap">
+      <p class="kicker"></p>
+      <p class="subcopy">Narrative-driven work with a cinematic backbone.<br>From concept to final cut, we focus on stories that feel intentional, human, and lasting — not disposable.</p>
+      <h1>WE MAKE FILMS,<br>NOT CONTENT.</h1>
+    </div>
+  </section>
+  <section class="chapter chapter--p2">
+    <div class="wrap">
+      <p class="kicker"></p>
+      <p class="subcopy">Commercial, editorial, and artistic photography built around clarity and mood.
+Every frame is composed to communicate — not decorate.</p>
+      <h1 class="p2-title" id="p2Title">IMAGES THAT<br>CARRY WEIGHT.</h1>
+      <div class="p2-slideshow" id="p2Slideshow" aria-hidden="true">
+        <img id="p2SlideImg" alt="">
+      </div>
+    </div>
+  </section>
+  <section class="chapter chapter--p3">
+    <div class="wrap">
+      <p class="kicker"></p>
+      <p class="subcopy">We design media campaigns that connect strategy, platforms, and audiences — without noise.
+From launch concepts to long-tail distribution, everything is intentional.</p>
+      <h1>IDEAS,STRUCTURED TO TRAVEL.</h1>
+    </div>
+  </section>
+  <section class="chapter chapter--p4">
+    <div class="wrap">
+      <p class="kicker"></p>
+      <p class="subcopy">Years in production become a practical compass that directs teams, budgets, and outcomes.</p>
+      <h1>EXPERIENCE,<br>TURNED INTO DIRECTION.</h1>
+    </div>
+  </section>
+</div>
+
+<div class="scroll-space"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+/* =====================
+   HELPERS
+===================== */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp =(a,b,t)=>a+(b-a)*t;
+const designW=1440;
+const designH=900;
+function updateScale(){
+  const scale=Math.min(1, innerWidth/designW, innerHeight/designH);
+  const padX=Math.max(0, (innerWidth - designW) / 2);
+  document.documentElement.style.setProperty("--scale", scale.toFixed(3));
+  document.documentElement.style.setProperty("--padX", `${padX.toFixed(0)}px`);
+}
+addEventListener("resize",updateScale);
+updateScale();
+
+/* =====================
+   SIDEWAYS SCROLL
+===================== */
+const rail=document.getElementById("rail");
+const dots=[...document.querySelectorAll(".status__item")];
+let targetY=0,smoothY=0,progress=0;
+addEventListener("scroll",()=>targetY=scrollY,{passive:true});
+
+function scrollLoop(){
+  smoothY+=(targetY-smoothY)*0.08;
+  const max=innerHeight*3;
+  progress=clamp(smoothY/max,0,1);
+
+  rail.style.transform=`translate3d(${-progress*innerWidth*3}px,0,0)`;
+
+  const idx=Math.round(progress*3);
+  dots.forEach(d=>d.classList.toggle("is-active",+d.dataset.i===idx));
+
+  const darkT=clamp((progress-0.5)*2,0,1);
+  document.documentElement.style.setProperty("--bgA",
+    `rgb(${lerp(255,12,darkT)},${lerp(255,15,darkT)},${lerp(255,20,darkT)})`);
+  document.documentElement.style.setProperty("--bgB",
+    `rgb(${lerp(242,27,darkT)},${lerp(242,34,darkT)},${lerp(242,48,darkT)})`);
+  document.documentElement.style.setProperty("--fg",darkT<0.5?"#0b0b0b":"#ffffff");
+  document.documentElement.style.setProperty("--dotOff",darkT<0.5?"rgba(0,0,0,.25)":"rgba(255,255,255,.35)");
+  document.documentElement.style.setProperty("--dotOn",darkT<0.5?"rgba(0,0,0,.85)":"#ffffff");
+
+  requestAnimationFrame(scrollLoop);
+}
+scrollLoop();
+
+/* =====================
+   WEBGL TYPO SPHERE (TEXTURE)
+===================== */
+const canvas=document.getElementById("bgCanvas");
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(2,devicePixelRatio));
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
+camera.position.set(0,1.4,6);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const key=new THREE.DirectionalLight(0xffffff,1.2);
+key.position.set(4,6,5);
+scene.add(key);
+
+function resize(){
+  renderer.setSize(innerWidth,innerHeight,false);
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize",resize);
+resize();
+
+/* === IMAGE PLANE (LENS) === */
+const lensTexture=new THREE.TextureLoader().load("Photos/lens.png");
+lensTexture.colorSpace=THREE.SRGBColorSpace;
+lensTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();
+
+const lensGeo=new THREE.PlaneGeometry(5.6,5.6);
+const lensMat=new THREE.MeshStandardMaterial({
+  map:lensTexture,
+  transparent:true,
+  roughness:0.6,
+  metalness:0.05
+});
+
+const lens=new THREE.Mesh(lensGeo,lensMat);
+lens.position.y=-2.2; // crop bottom
+scene.add(lens);
+
+let lastY=0;
+let roll=0;
+let lastX=0;
+function render(){
+  const vel=smoothY-lastY;
+  lastY=smoothY;
+
+  const stopAt=2/3; // end of pillar 02
+  const exitAt=0.8; // wait a bit into pillar 03 before sliding out
+  const moveT=clamp(progress/stopAt,0,1);
+  const exitT=clamp((progress-exitAt)/(1-exitAt),0,1);
+  const moving=progress<=stopAt;
+  const exiting=progress>=exitAt;
+
+  const targetX=moving
+    ? lerp(-1.6,1.6,moveT)
+    : (exiting ? lerp(1.6,-4.5,exitT) : 1.6);
+
+  roll+=(targetX-lastX)*-0.9;
+  lastX=targetX;
+  lens.rotation.set(0,0,roll);
+  lens.position.x=targetX;
+
+  renderer.render(scene,camera);
+  requestAnimationFrame(render);
+}
+render();
+
+/* =====================
+   P2 HOVER SLIDESHOW
+===================== */
+const p2Target=document.getElementById("p2Title");
+const p2Slideshow=document.getElementById("p2Slideshow");
+const p2SlideImg=document.getElementById("p2SlideImg");
+const p2Images=[
+  "Photos/Architektur_1.jpg",
+  "Photos/Architektur_2.jpg",
+  "Photos/Architektur_3.jpg",
+  "Photos/Architektur_4.jpg",
+  "Photos/Architektur_5.jpg",
+  "Photos/Architektur_6.jpg",
+  "Photos/Architektur_7.jpg",
+  "Photos/Architektur_8.jpg",
+  "Photos/Architektur_9.jpg"
+];
+let p2Idx=0;
+let p2Timer=null;
+let p2Active=false;
+let p2Mouse={x:0,y:0};
+let p2SplitDone=false;
+const p2Offset=16;
+const p2Pad=16;
+
+if(p2Slideshow && p2Slideshow.parentElement !== document.body){
+  document.body.appendChild(p2Slideshow);
+}
+
+function positionP2Slideshow(){
+  if(!p2Slideshow) return;
+  const w=p2Slideshow.offsetWidth;
+  const h=p2Slideshow.offsetHeight;
+  let x=p2Mouse.x + p2Offset;
+  let y=p2Mouse.y + p2Offset;
+  x=Math.min(x, innerWidth - w - p2Pad);
+  x=Math.max(p2Pad, x);
+  y=Math.min(y, innerHeight - h - p2Pad);
+  y=Math.max(p2Pad, y);
+  p2Slideshow.style.left=`${x}px`;
+  p2Slideshow.style.top=`${y}px`;
+}
+
+function splitP2Title(){
+  if(!p2Target || p2SplitDone) return;
+  const raw=p2Target.innerHTML.replace(/<br\s*\/?>/gi," \n ");
+  p2Target.innerHTML="";
+  const parts=raw.split(/\s+/).filter(Boolean);
+  let toggle=true;
+  parts.forEach((part,i)=>{
+    if(part==="\\n"){
+      p2Target.appendChild(document.createElement("br"));
+      return;
+    }
+    const span=document.createElement("span");
+    span.className=toggle ? "front" : "back";
+    span.textContent=part;
+    p2Target.appendChild(span);
+    if(i<parts.length-1) p2Target.append(" ");
+    toggle=!toggle;
+  });
+  p2SplitDone=true;
+}
+
+function p2Show(){
+  if(!p2Slideshow || !p2SlideImg) return;
+  splitP2Title();
+  p2Active=true;
+  p2Slideshow.style.visibility="visible";
+  p2Slideshow.style.opacity="1";
+  positionP2Slideshow();
+  p2SlideImg.src=p2Images[p2Idx];
+  p2Idx=(p2Idx+1)%p2Images.length;
+  p2Timer=setInterval(()=>{
+    p2SlideImg.src=p2Images[p2Idx];
+    p2Idx=(p2Idx+1)%p2Images.length;
+  },1600);
+}
+function p2Hide(){
+  if(!p2Slideshow) return;
+  p2Active=false;
+  p2Slideshow.style.opacity="0";
+  p2Slideshow.style.visibility="hidden";
+  clearInterval(p2Timer);
+  p2Timer=null;
+}
+
+if(p2Target){
+  splitP2Title();
+  p2Target.addEventListener("mouseenter",p2Show);
+  p2Target.addEventListener("mouseleave",p2Hide);
+}
+
+addEventListener("mousemove",(e)=>{
+  p2Mouse.x=e.clientX;
+  p2Mouse.y=e.clientY;
+  if(!p2Active || !p2Slideshow) return;
+  positionP2Slideshow();
+});
+</script>
+
+</body>
+</html>

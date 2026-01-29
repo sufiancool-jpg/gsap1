@@ -1,0 +1,183 @@
+/* Desktop overrides (min-width: 1441px, max-width: 1920px). */
+
+@media (min-width: 1441px) and (max-width: 1920px) {
+  .pillars-section .status {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: min(88%, 1180px);
+    gap: clamp(12px, 2vw, 28px);
+  }
+
+  .pillars-section .status__item {
+    white-space: nowrap;
+  }
+
+  .pillars-section .chapter--p1 {
+    overflow: visible;
+  }
+
+  .pillars-section .chapter--p1 .wrap {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "h1"
+      "subcopy";
+    justify-items: start;
+    justify-self: end;
+    text-align: left;
+    transform: translateX(calc(var(--padX) + clamp(60px, 6vw, 160px)));
+    row-gap: clamp(18px, 3.4vw, 32px);
+    overflow: visible;
+  }
+
+  .pillars-section .chapter--p1 h1 {
+    justify-self: start;
+    text-align: left;
+    font-weight: 800;
+  }
+
+  .pillars-section .chapter--p1 .subcopy-images {
+    display: none;
+  }
+
+  .pillars-section .chapter--p1 .subcopy {
+    font-size: clamp(20px, 2vw, 28px);
+    max-width: none;
+    width: min(40vw, 680px);
+    text-align: left;
+  }
+
+  .pillars-section .chapter--p2 .wrap {
+    justify-self: center;
+    text-align: center;
+    transform: translateX(0);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "kicker"
+      "subcopy"
+      "slideshow"
+      "title";
+    row-gap: clamp(14px, 2vw, 22px);
+    padding-right: 0;
+    padding-top: clamp(120px, 16vh, 210px);
+  }
+
+  .pillars-section .chapter--p2 .kicker {
+    grid-area: kicker;
+    justify-self: center;
+    text-align: center;
+  }
+
+  .pillars-section .chapter--p2 .subcopy {
+    grid-area: subcopy;
+    font-size: clamp(18px, 2vw, 26px);
+    max-width: 48ch;
+    text-align: left;
+    margin-left: 0;
+    margin-right: auto;
+    margin-top: clamp(-28px, -3vh, -64px);
+    margin-bottom: clamp(10px, 2vh, 26px);
+    transform: translateX(clamp(-18px, -2vw, -48px));
+  }
+
+  .pillars-section .chapter--p2 .p2-title {
+    grid-area: title;
+    text-align: center;
+    margin-top: clamp(-98px, -10vh, -200px);
+    font-size: clamp(52px, 5.2vw, 92px);
+    font-weight: 800;
+  }
+
+  .pillars-section .p23-window {
+    grid-area: slideshow;
+    position: relative;
+    right: auto;
+    left: auto;
+    top: auto;
+    margin: clamp(-92px, -9vh, -150px) 0 0;
+    justify-self: end;
+    margin-right: clamp(16px, 2vw, 44px);
+    width: min(52vw, 460px);
+    height: min(30vw, 260px);
+  }
+
+  .pillars-section .chapter--p3 h1 {
+    margin-top: calc(-135px * var(--scale));
+    font-size: calc(80px * var(--scale));
+    transform: translateX(calc(200px * var(--scale)));
+    text-align: left;
+    margin-left: auto;
+  }
+
+  .pillars-section .chapter--p3 {
+    overflow: visible;
+  }
+
+  .pillars-section .chapter--p3 .subcopy {
+    font-size: clamp(18px, 2.2vw, 26px);
+    max-width: 36ch;
+    margin-top: clamp(28px, 4.5vh, 90px);
+    text-align: left;
+  }
+
+  .about-inner {
+    align-items: center;
+  }
+
+  .about-hero {
+    text-align: center;
+  }
+
+  .about-title {
+    text-align: center;
+  }
+
+  .about-lead {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .about-body {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 62ch;
+  }
+
+  .about-contact {
+    display: none;
+  }
+
+  .about-portraits {
+    width: min(760px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-items: center;
+    gap: clamp(16px, 3vw, 32px);
+  }
+
+  .about-portrait {
+    aspect-ratio: auto;
+    overflow: visible;
+  }
+
+  .about-portrait img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .site-header.header-about {
+    background: rgba(8, 44, 56, 0);
+    border-radius: 18px;
+    padding: 0.6rem 1rem;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+  }
+}

@@ -49,8 +49,12 @@ const matteRoot = document.documentElement;
 let matteInset = 0;
 let matteAllowed = true;
 let matteEnabled = false;
-const matteMq = window.matchMedia("(max-width: 1024px)");
-const phoneMq = window.matchMedia("(max-width: 700px)");
+const matteMq = window.matchMedia("(max-width: 768px)");
+const phoneMq = window.matchMedia("(max-width: 480px)");
+const tabletMq = window.matchMedia("(min-width: 769px) and (max-width: 1024px)");
+const laptopMq = window.matchMedia("(min-width: 1025px) and (max-width: 1440px)");
+const desktopMq = window.matchMedia("(min-width: 1441px) and (max-width: 1920px)");
+const fourKMq = window.matchMedia("(min-width: 1921px)");
 const enableMatte = (on) => {
   matteEnabled = on && matteAllowed;
   matteRoot.classList.toggle("matte-on", matteEnabled);
@@ -96,6 +100,11 @@ updateMatteAllowance();
 enableMatte(false);
 setMatteState({ inset: 0, radius: 0 });
 const isPhone = () => (phoneMq ? phoneMq.matches : false);
+const isTablet = () => (tabletMq ? tabletMq.matches : false);
+const isLaptop = () => (laptopMq ? laptopMq.matches : false);
+const isDesktop = () => (desktopMq ? desktopMq.matches : false);
+const isFourK = () => (fourKMq ? fourKMq.matches : false);
+const isAboutMenuMode = () => isTablet() || isLaptop() || isDesktop() || isFourK();
 const setThemeLight = () => {
   if (body) body.classList.add("theme-light");
 };
@@ -125,8 +134,19 @@ const computeLogoTarget = () => {
 
   brandRect = brand.getBoundingClientRect();
   scale = brandRect.height / logoRect.height;
+  const useCenteredTarget = isPhone();
+  const logoCenterX = logoRect.left + logoRect.width / 2;
+  const brandCenterX = brandRect.left + brandRect.width / 2;
+  const phoneTargetX = useCenteredTarget ? 0 : null;
   logoTarget = {
-    x: Math.round(brandRect.left - logoRect.left),
+    x:
+      phoneTargetX !== null
+        ? phoneTargetX
+        : Math.round(
+            useCenteredTarget
+              ? brandCenterX - logoCenterX
+              : brandRect.left - logoRect.left
+          ),
     y: Math.round(brandRect.top - logoRect.top),
     scale: Number(scale.toFixed(4)),
   };
@@ -364,6 +384,7 @@ navButtons.forEach((button) => {
   window.addEventListener("blur", resetFill);
 });
 
+
 const stageSection = document.querySelector(".stage");
 if (stageSection) {
   ScrollTrigger.create({
@@ -373,21 +394,79 @@ if (stageSection) {
     onEnter: () => {
       enableMatte(false);
       setMatteState({ inset: 0, radius: 0 });
+      if (!isPhone()) {
+        showHeaderNow();
+      }
     },
     onEnterBack: () => {
       enableMatte(false);
       setMatteState({ inset: 0, radius: 0 });
+      if (!isPhone()) {
+        showHeaderNow();
+      }
     },
   });
 }
 
 const aboutLink = document.querySelector('a[href="#about"]');
 const aboutSection = document.querySelector("#about");
+const aboutTitle = document.querySelector(".about-title");
+const aboutTitleText = aboutTitle ? aboutTitle.textContent : "";
+const aboutNavLabel = aboutLink ? aboutLink.querySelector(".btn-label") : null;
+const aboutNavText = aboutNavLabel ? aboutNavLabel.textContent : "About us";
+let aboutNavIsHome = false;
+
+const setAboutNavState = (nextIsHome) => {
+  if (!aboutNavLabel || !aboutLink) return;
+  if (!isAboutMenuMode()) {
+    aboutNavIsHome = false;
+    aboutNavLabel.textContent = aboutNavText;
+    return;
+  }
+  aboutNavIsHome = nextIsHome;
+  aboutNavLabel.textContent = nextIsHome ? "Home" : aboutNavText;
+};
+
+const setHeaderAboutTone = (on) => {
+  if (!header) return;
+  const active = on && isAboutMenuMode();
+  header.classList.toggle("header-about", active);
+  if (active) {
+    gsap.fromTo(
+      header,
+      { backgroundColor: "rgba(8, 44, 56, 0)" },
+      {
+        backgroundColor: "rgba(8, 44, 56, 0.72)",
+        duration: 0.35,
+        ease: "power2.out",
+        overwrite: "auto",
+      }
+    );
+  } else {
+    gsap.to(header, {
+      backgroundColor: "rgba(8, 44, 56, 0)",
+      duration: 0.2,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  }
+};
+
+const syncAboutTitle = () => {
+  if (!aboutTitle || !aboutTitleText) return;
+  aboutTitle.textContent = isTablet() || isPhone()
+    ? aboutTitleText.replace(/\.\s*$/, "")
+    : aboutTitleText;
+};
 if (aboutLink && aboutSection) {
+  syncAboutTitle();
+  window.addEventListener("resize", syncAboutTitle);
+
   aboutLink.addEventListener("click", (event) => {
     event.preventDefault();
+    const targetSelector = aboutNavIsHome ? "#stage" : "#about";
     if (smoother) {
-      const target = smoother.offset("#about", "top top");
+      const target = smoother.offset(targetSelector, "top top");
       gsap.to(smoother, {
         scrollTop: target,
         duration: 1.4,
@@ -397,9 +476,9 @@ if (aboutLink && aboutSection) {
         onComplete: () => ScrollTrigger.refresh(),
       });
     } else {
-      const aboutEl = document.querySelector("#about");
-      if (aboutEl) {
-        aboutEl.scrollIntoView({ behavior: "smooth" });
+      const targetEl = document.querySelector(targetSelector);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth" });
         requestAnimationFrame(() => ScrollTrigger.refresh());
       }
     }
@@ -409,7 +488,7 @@ if (aboutLink && aboutSection) {
 if (aboutSection) {
   ScrollTrigger.create({
     trigger: aboutSection,
-    start: "top 70%",
+    start: () => (isTablet() ? "top 85%" : "top 70%"),
     onEnter: setThemeDark,
     onEnterBack: setThemeDark,
     onLeaveBack: setThemeLight,
@@ -417,9 +496,38 @@ if (aboutSection) {
 
   ScrollTrigger.create({
     trigger: aboutSection,
-    start: "top 80%",
-    onEnter: showHeaderNow,
-    onEnterBack: showHeaderNow,
+    start: "top 55%",
+    onEnter: () => {
+      matteRoot.style.removeProperty("--logo-color");
+      if (isPhone()) {
+        hideHeaderNow();
+      } else {
+        showHeaderNow();
+      }
+      setAboutNavState(true);
+      setHeaderAboutTone(true);
+    },
+    onEnterBack: () => {
+      matteRoot.style.removeProperty("--logo-color");
+      if (isPhone()) {
+        hideHeaderNow();
+      } else {
+        showHeaderNow();
+      }
+      setAboutNavState(true);
+      setHeaderAboutTone(true);
+    },
+    onLeave: () => {
+      setAboutNavState(false);
+      setHeaderAboutTone(false);
+    },
+    onLeaveBack: () => {
+      setAboutNavState(false);
+      setHeaderAboutTone(false);
+      if (isPhone()) {
+        showHeaderNow();
+      }
+    },
   });
 
   ScrollTrigger.create({
@@ -464,7 +572,7 @@ heroTl
       x: () => logoTarget.x,
       y: () => logoTarget.y,
       scale: () => logoTarget.scale,
-      transformOrigin: "left top",
+      transformOrigin: () => (isPhone() ? "center top" : "left top"),
       duration: heroRevealDuration,
       ease: "power2.out",
     },
@@ -495,16 +603,22 @@ heroTl
   .set(".site-brand", { autoAlpha: 1 }, heroRevealDuration);
 
 if (header) {
-  heroTl.to(
-    header,
-    {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.25,
-      ease: "power2.out",
-    },
-    heroRevealDuration - 0.35
-  );
+  if (isPhone() || isTablet()) {
+    const headerRevealDuration = isTablet() ? 0.6 : 0.25;
+    const headerRevealStart = isTablet()
+      ? heroRevealDuration - headerRevealDuration
+      : heroRevealDuration - 0.35;
+    heroTl.to(
+      header,
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: headerRevealDuration,
+        ease: "power2.out",
+      },
+      headerRevealStart
+    );
+  }
 }
 
 const video = document.querySelector(".hero-video");
@@ -787,8 +901,166 @@ if (pillarsSection && pillarsRail) {
   let renderer = null;
   let camera = null;
   let scene = null;
+  const baseLensY = -2.2;
+  let lensY = baseLensY;
   let lastX = 0;
   let roll = 0;
+  const p23Window = pillarsSection.querySelector("#p23Window");
+  const setP23X = p23Window ? gsap.quickSetter(p23Window, "x", "px") : null;
+  const setP23Y = p23Window ? gsap.quickSetter(p23Window, "y", "px") : null;
+  const setP23Scale = p23Window ? gsap.quickSetter(p23Window, "scale") : null;
+  const setP23Alpha = p23Window ? gsap.quickSetter(p23Window, "opacity") : null;
+  const p23Wrap = pillarsSection.querySelector(".chapter--p2 .wrap");
+  let p23HoverExpand = false;
+  const p23ExpandState = { t: 0 };
+  const p2Title = p23Wrap ? p23Wrap.querySelector(".p2-title") : null;
+  const p2Subcopy = p23Wrap ? p23Wrap.querySelector(".subcopy") : null;
+  const p2Kicker = p23Wrap ? p23Wrap.querySelector(".kicker") : null;
+  const p2FadeTargets = [p2Kicker, p2Subcopy, p2Title].filter(Boolean);
+  let p23Base = null;
+  const cacheP23Base = () => {
+    if (!p23Window || !p23Wrap || p23HoverExpand) return;
+    const rect = p23Window.getBoundingClientRect();
+    const styles = window.getComputedStyle(p23Wrap);
+    p23Base = {
+      w: rect.width,
+      h: rect.height,
+      padRight: parseFloat(styles.paddingRight) || 0,
+      padTop: parseFloat(styles.paddingTop) || 0,
+    };
+  };
+  const applyP23Expand = (expanded) => {
+    if (!p23Window || !p23Wrap) return;
+    if (!p23Base) cacheP23Base();
+    if (!p23Base) return;
+
+    const wrapW = p23Wrap.clientWidth || p23Base.w;
+    const wrapH = p23Wrap.clientHeight || p23Base.h;
+    const smallScreen = isTablet() || isPhone();
+    const mediumScreen = isLaptop() || isDesktop();
+    const expandScale = smallScreen ? 1.6 : mediumScreen ? 1.65 : isFourK() ? 2.6 : 2.2;
+    const maxW = wrapW * (smallScreen ? 1.0 : mediumScreen ? 1.1 : isFourK() ? 1.35 : 1.2);
+    const maxH = wrapH * (smallScreen ? 1.0 : mediumScreen ? 1.1 : isFourK() ? 1.35 : 1.2);
+    const targetW = expanded ? Math.min(p23Base.w * expandScale, maxW) : p23Base.w;
+    const targetH = expanded ? Math.min(p23Base.h * expandScale, maxH) : p23Base.h;
+    const targetPadRight = p23Base.padRight;
+    const targetPadTop = p23Base.padTop;
+    const duration = expanded ? 0.45 : 0.35;
+    const ease = "power2.inOut";
+
+    gsap.to(p23Window, {
+      width: targetW,
+      height: targetH,
+      duration,
+      ease,
+      overwrite: true,
+    });
+    gsap.to(p23ExpandState, {
+      t: expanded ? 1 : 0,
+      duration,
+      ease,
+      overwrite: true,
+    });
+    if (p2FadeTargets.length) {
+      if (expanded) {
+        gsap.to(p2FadeTargets, {
+          autoAlpha: 0,
+          duration,
+          ease,
+          overwrite: true,
+        });
+      } else {
+        gsap.to(p2FadeTargets, {
+          autoAlpha: 1,
+          duration: 0.2,
+          ease: "power2.out",
+          delay: duration,
+          overwrite: true,
+        });
+      }
+    }
+  };
+  const p1Subcopy = pillarsSection.querySelector(".chapter--p1 .subcopy");
+  const p23Frames = [
+    "Photos/nyc/feedthegreed.jpg",
+    "Photos/nyc/nyc.jpg",
+    "Photos/nyc/nyc-01(1).jpg",
+    "Photos/nyc/nyc-01.jpg",
+    "Photos/nyc/nyc-02(1).jpg",
+    "Photos/nyc/nyc-02.jpg",
+    "Photos/nyc/nyc-03(1).jpg",
+    "Photos/nyc/nyc-03.jpg",
+    "Photos/nyc/nyc-05(1).jpg",
+    "Photos/nyc/nyc-05.jpg",
+    "Photos/nyc/nyc-06(1).jpg",
+    "Photos/nyc/nyc-06.jpg",
+    "Photos/nyc/nyc-07(1).jpg",
+    "Photos/nyc/nyc-07.jpg",
+    "Photos/nyc/nyc-08(1).jpg",
+    "Photos/nyc/nyc-08.jpg",
+    "Photos/nyc/nyc-09(1).jpg",
+    "Photos/nyc/nyc-09.jpg",
+    "Photos/nyc/nyc-10(1).jpg",
+    "Photos/nyc/nyc-10.jpg",
+    "Photos/nyc/nyc-11(1).jpg",
+    "Photos/nyc/nyc-11.jpg",
+    "Photos/nyc/nyc-12(1).jpg",
+    "Photos/nyc/nyc-12.jpg",
+    "Photos/nyc/nyc-13.jpg",
+    "Photos/nyc/nyc-15.jpg",
+    "Photos/nyc/nyc-16.jpg",
+    "Photos/nyc/nyc-17.jpg",
+    "Photos/nyc/nyc-18.jpg",
+    "Photos/nyc/nyc-19.jpg",
+    "Photos/nyc/nyc-20.jpg",
+    "Photos/nyc/RJ387048.jpg",
+    "Photos/nyc/RJ388148.jpg",
+    "Photos/nyc/RJ388341(1).jpg",
+    "Photos/nyc/RJ388341.jpg",
+    "Photos/nyc/RJ390300.jpg",
+    "Photos/nyc/RJ404959.jpg",
+  ];
+  let p23Idx = 0;
+  let p23Timer = null;
+  let p23Interval = 0;
+  const p23DefaultInterval = 1400;
+  const p23HoverInterval = 1800;
+  const updateP23Frame = () => {
+    if (!p23Window) return;
+    const frame = p23Frames[p23Idx];
+    p23Window.style.backgroundImage = `url(${frame})`;
+    p23Idx = (p23Idx + 1) % p23Frames.length;
+  };
+  const startP23 = (interval = p23DefaultInterval) => {
+    if (prefersReducedMotion || !p23Window) return;
+    if (p23Timer && p23Interval === interval) return;
+    stopP23();
+    p23Interval = interval;
+    updateP23Frame();
+    p23Timer = setInterval(updateP23Frame, interval);
+  };
+  const stopP23 = () => {
+    if (!p23Timer) return;
+    clearInterval(p23Timer);
+    p23Timer = null;
+  };
+
+  if (p23Window && p23Wrap) {
+    p23Window.addEventListener("mouseenter", () => {
+      p23HoverExpand = true;
+      cacheP23Base();
+      applyP23Expand(true);
+      startP23(p23HoverInterval);
+    });
+    p23Window.addEventListener("mouseleave", () => {
+      p23HoverExpand = false;
+      applyP23Expand(false);
+      startP23(p23DefaultInterval);
+    });
+    window.addEventListener("resize", cacheP23Base);
+    cacheP23Base();
+  }
+  const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
   let pillarsActive = false;
   const updateTheme = (progress) => {
@@ -825,8 +1097,23 @@ if (pillarsSection && pillarsRail) {
   updateTheme(0);
 
   const getScrollDistance = () =>
-    Math.max(pillarsSection.clientHeight, pillarsSection.clientWidth) * 3;
+    Math.max(pillarsSection.clientHeight, pillarsSection.clientWidth) * 4;
   const getRailShift = () => pillarsSection.clientWidth * 3;
+
+  ScrollTrigger.create({
+    trigger: pillarsSection,
+    start: "top 95%",
+    end: "top top",
+    onEnter: () => {
+      if (!isPhone()) hideHeaderNow();
+    },
+    onEnterBack: () => {
+      if (!isPhone()) hideHeaderNow();
+    },
+    onLeaveBack: () => {
+      if (!isPhone()) hideHeaderNow();
+    },
+  });
 
   gsap.to(pillarsRail, {
     x: () => -getRailShift(),
@@ -855,6 +1142,8 @@ if (pillarsSection && pillarsRail) {
       },
       onLeaveBack: () => {
         setThemeDark();
+        enableMatte(false);
+        setMatteState({ inset: 0, radius: 0 });
       },
       onToggle: (self) => {
         pillarsActive = self.isActive;
@@ -865,7 +1154,6 @@ if (pillarsSection && pillarsRail) {
             hideHeaderNow();
           }
         } else {
-          showHeaderNow();
           matteRoot.style.removeProperty("--logo-color");
         }
       },
@@ -898,7 +1186,7 @@ if (pillarsSection && pillarsRail) {
     });
 
     lens = new THREE.Mesh(lensGeo, lensMat);
-    lens.position.y = -2.2;
+    lens.position.y = baseLensY;
     scene.add(lens);
   }
 
@@ -921,6 +1209,40 @@ if (pillarsSection && pillarsRail) {
     smoothProgress += (targetProgress - smoothProgress) * 0.08;
     updateTheme(smoothProgress);
 
+    if (p1Subcopy) {
+      pillarsSection.style.setProperty("--p1-subcopy-color", "#000000");
+    }
+
+    if (setP23X && setP23Scale && setP23Alpha) {
+      const inStart = 0.2;
+      const inEnd = 0.34;
+      const outStart = 0.5;
+      const outEnd = 0.64;
+      const inT = clampValue((smoothProgress - inStart) / (inEnd - inStart), 0, 1);
+      const outT = clampValue((smoothProgress - outStart) / (outEnd - outStart), 0, 1);
+      const easeIn = easeInOut(inT);
+      const easeOut = easeInOut(outT);
+      const alpha = inT * (1 - outT);
+      const x = outT > 0 ? lerpValue(0, -260, easeOut) : lerpValue(220, 0, easeIn);
+      const scale = outT > 0 ? lerpValue(1, 0.96, easeOut) : lerpValue(0.94, 1, easeIn);
+
+      setP23X(x);
+      if (setP23Y) setP23Y(0);
+      setP23Scale(scale);
+      setP23Alpha(alpha);
+
+      if (p23HoverExpand && alpha < 0.05) {
+        p23HoverExpand = false;
+        applyP23Expand(false);
+      }
+
+      if (alpha > 0.05) {
+        startP23(p23DefaultInterval);
+      } else {
+        stopP23();
+      }
+    }
+
     if (renderer && lens && camera) {
       const stopAt = 2 / 3;
       const exitAt = 0.8;
@@ -937,9 +1259,11 @@ if (pillarsSection && pillarsRail) {
 
       roll += (targetX - lastX) * -0.9;
       lastX = targetX;
+      const targetLensY = baseLensY - 0.7 * p23ExpandState.t;
+      lensY += (targetLensY - lensY) * 0.12;
       lens.rotation.set(0, 0, roll);
       lens.position.x = targetX;
-
+      lens.position.y = lensY;
       renderer.render(scene, camera);
     }
 
@@ -948,105 +1272,6 @@ if (pillarsSection && pillarsRail) {
 
   loop();
 }
-
-const p2Target = document.querySelector("#p2Title");
-const p2Slideshow = document.querySelector("#p2Slideshow");
-const p2SlideImg = document.querySelector("#p2SlideImg");
-const p2Images = [
-  "Photos/Architektur_1.jpg",
-  "Photos/Architektur_2.jpg",
-  "Photos/Architektur_3.jpg",
-  "Photos/Architektur_4.jpg",
-  "Photos/Architektur_5.jpg",
-  "Photos/Architektur_6.jpg",
-  "Photos/Architektur_7.jpg",
-  "Photos/Architektur_8.jpg",
-  "Photos/Architektur_9.jpg",
-];
-
-let p2Idx = 0;
-let p2Timer = null;
-let p2Active = false;
-let p2Mouse = { x: 0, y: 0 };
-let p2SplitDone = false;
-const p2Offset = 16;
-const p2Pad = 16;
-
-if (p2Slideshow && p2Slideshow.parentElement !== document.body) {
-  document.body.appendChild(p2Slideshow);
-}
-
-const positionP2Slideshow = () => {
-  if (!p2Slideshow) return;
-  const w = p2Slideshow.offsetWidth;
-  const h = p2Slideshow.offsetHeight;
-  let x = p2Mouse.x + p2Offset;
-  let y = p2Mouse.y + p2Offset;
-  x = Math.min(x, window.innerWidth - w - p2Pad);
-  x = Math.max(p2Pad, x);
-  y = Math.min(y, window.innerHeight - h - p2Pad);
-  y = Math.max(p2Pad, y);
-  p2Slideshow.style.left = `${x}px`;
-  p2Slideshow.style.top = `${y}px`;
-};
-
-const splitP2Title = () => {
-  if (!p2Target || p2SplitDone) return;
-  const raw = p2Target.innerHTML.replace(/<br\s*\/?>/gi, " \\n ");
-  p2Target.innerHTML = "";
-  const parts = raw.split(/\s+/).filter(Boolean);
-  let toggle = true;
-  parts.forEach((part, index) => {
-    if (part === "\\n") {
-      p2Target.appendChild(document.createElement("br"));
-      return;
-    }
-    const span = document.createElement("span");
-    span.className = toggle ? "front" : "back";
-    span.textContent = part;
-    p2Target.appendChild(span);
-    if (index < parts.length - 1) p2Target.append(" ");
-    toggle = !toggle;
-  });
-  p2SplitDone = true;
-};
-
-const p2Show = () => {
-  if (!p2Slideshow || !p2SlideImg) return;
-  splitP2Title();
-  p2Active = true;
-  p2Slideshow.style.visibility = "visible";
-  p2Slideshow.style.opacity = "1";
-  positionP2Slideshow();
-  p2SlideImg.src = p2Images[p2Idx];
-  p2Idx = (p2Idx + 1) % p2Images.length;
-  p2Timer = setInterval(() => {
-    p2SlideImg.src = p2Images[p2Idx];
-    p2Idx = (p2Idx + 1) % p2Images.length;
-  }, 1600);
-};
-
-const p2Hide = () => {
-  if (!p2Slideshow) return;
-  p2Active = false;
-  p2Slideshow.style.opacity = "0";
-  p2Slideshow.style.visibility = "hidden";
-  clearInterval(p2Timer);
-  p2Timer = null;
-};
-
-if (p2Target) {
-  splitP2Title();
-  p2Target.addEventListener("mouseenter", p2Show);
-  p2Target.addEventListener("mouseleave", p2Hide);
-}
-
-window.addEventListener("mousemove", (event) => {
-  p2Mouse.x = event.clientX;
-  p2Mouse.y = event.clientY;
-  if (!p2Active || !p2Slideshow) return;
-  positionP2Slideshow();
-});
 
 const footer = document.querySelector(".site-footer");
 if (footer) {

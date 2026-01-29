@@ -122,35 +122,36 @@ h2,h3{
   margin:0;
 }
 
-/* P2 hover slideshow */
-.p2-slideshow{
+/* P2.5 slide panel */
+.p25-panel{
   position:fixed;
-  width:480px;
-  height:auto;
+  left:50%;
+  top:50%;
+  width:min(1120px, 86vw);
+  height:min(740px, 78vh);
+  transform:translate(-50%,-50%) translateX(var(--p25-x, 60vw)) scale(var(--p25-scale, 0.6));
+  opacity:var(--p25-alpha, 0);
+  background:#111111;
+  border:1px solid rgba(255,255,255,0.14);
   overflow:hidden;
-  border-radius:0;
-  box-shadow:none;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  left:0;
-  top:0;
-  background:#e9e9e9;
   z-index:4;
+  pointer-events:none;
+  will-change:transform,opacity;
 }
-.p2-slideshow img{
+.p25-panel img{
   width:100%;
-  height:auto;
-  object-fit:contain;
+  height:100%;
+  object-fit:cover;
   display:block;
+  transition:opacity .4s ease;
+  opacity:1;
 }
-.p2-title .front{
-  position:relative;
-  z-index:5;
-}
-.p2-title .back{
-  position:relative;
-  z-index:1;
+.p25-panel img.is-fading{opacity:0;}
+@media (max-width:900px){
+  .p25-panel{
+    width:90vw;
+    height:60vh;
+  }
 }
 .logo{
   font-family:var(--font-logo);
@@ -273,9 +274,6 @@ h2,h3{
       <p class="subcopy">Commercial, editorial, and artistic photography built around clarity and mood.
 Every frame is composed to communicate — not decorate.</p>
       <h1 class="p2-title" id="p2Title">IMAGES THAT<br>CARRY WEIGHT.</h1>
-      <div class="p2-slideshow" id="p2Slideshow" aria-hidden="true">
-        <img id="p2SlideImg" alt="">
-      </div>
     </div>
   </section>
   <section class="chapter chapter--p3">
@@ -295,6 +293,10 @@ From launch concepts to long-tail distribution, everything is intentional.</p>
   </section>
 </div>
 
+<div class="p25-panel" id="p25Panel" aria-hidden="true">
+  <img id="p25SlideImg" alt="">
+</div>
+
 <div class="scroll-space"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -304,6 +306,7 @@ From launch concepts to long-tail distribution, everything is intentional.</p>
 ===================== */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp =(a,b,t)=>a+(b-a)*t;
+const easeInOut=(t)=>t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
 const designW=1440;
 const designH=900;
 function updateScale(){
@@ -320,6 +323,16 @@ updateScale();
 ===================== */
 const rail=document.getElementById("rail");
 const dots=[...document.querySelectorAll(".status__item")];
+const p25Panel=document.getElementById("p25Panel");
+const p25SlideImg=document.getElementById("p25SlideImg");
+const p25Images=[
+  "Photos/Architektur_2.jpg",
+  "Photos/Architektur_5.jpg",
+  "Photos/Architektur_8.jpg"
+];
+let p25Idx=0;
+let p25Timer=null;
+let p25Active=false;
 let targetY=0,smoothY=0,progress=0;
 addEventListener("scroll",()=>targetY=scrollY,{passive:true});
 
@@ -342,9 +355,70 @@ function scrollLoop(){
   document.documentElement.style.setProperty("--dotOff",darkT<0.5?"rgba(0,0,0,.25)":"rgba(255,255,255,.35)");
   document.documentElement.style.setProperty("--dotOn",darkT<0.5?"rgba(0,0,0,.85)":"#ffffff");
 
+  if(p25Panel){
+    const p25Start=0.24;
+    const p25End=0.80;
+    const p25HoldStart=0.35;
+    const p25HoldEnd=0.72;
+    const p25Visible=progress>=p25Start && progress<=p25End;
+    const xRange=innerWidth*0.65;
+    const p25T=clamp((progress-p25Start)/(p25End-p25Start),0,1);
+    let x=xRange;
+    let scale=0.6;
+    let alpha=0;
+
+    if(p25Visible){
+      if(!p25Active) p25StartShow();
+      if(p25T<=p25HoldStart){
+        const t=easeInOut(p25T/p25HoldStart);
+        x=lerp(xRange,0,t);
+        scale=lerp(0.6,1.18,t);
+        alpha=t;
+      }else if(p25T<=p25HoldEnd){
+        const t=easeInOut((p25T-p25HoldStart)/(p25HoldEnd-p25HoldStart));
+        x=0;
+        scale=lerp(1.18,1.08,t);
+        alpha=1;
+      }else{
+        const t=easeInOut((p25T-p25HoldEnd)/(1-p25HoldEnd));
+        x=lerp(0,-xRange,t);
+        scale=lerp(1.08,0.6,t);
+        alpha=lerp(1,0,t);
+      }
+    }else if(p25Active){
+      p25StopShow();
+    }
+
+    p25Panel.style.setProperty("--p25-x",`${x.toFixed(0)}px`);
+    p25Panel.style.setProperty("--p25-scale",scale.toFixed(3));
+    p25Panel.style.setProperty("--p25-alpha",alpha.toFixed(3));
+  }
+
   requestAnimationFrame(scrollLoop);
 }
 scrollLoop();
+
+function p25NextImage(){
+  if(!p25SlideImg || !p25Images.length) return;
+  p25SlideImg.classList.add("is-fading");
+  const next=p25Images[p25Idx];
+  p25Idx=(p25Idx+1)%p25Images.length;
+  p25SlideImg.onload=()=>p25SlideImg.classList.remove("is-fading");
+  p25SlideImg.src=next;
+}
+function p25StartShow(){
+  if(!p25Panel || !p25SlideImg || p25Active) return;
+  p25Active=true;
+  p25Panel.setAttribute("aria-hidden","false");
+  p25NextImage();
+  p25Timer=setInterval(p25NextImage,1800);
+}
+function p25StopShow(){
+  p25Active=false;
+  if(p25Panel) p25Panel.setAttribute("aria-hidden","true");
+  clearInterval(p25Timer);
+  p25Timer=null;
+}
 
 /* =====================
    WEBGL TYPO SPHERE (TEXTURE)
@@ -414,106 +488,6 @@ function render(){
   requestAnimationFrame(render);
 }
 render();
-
-/* =====================
-   P2 HOVER SLIDESHOW
-===================== */
-const p2Target=document.getElementById("p2Title");
-const p2Slideshow=document.getElementById("p2Slideshow");
-const p2SlideImg=document.getElementById("p2SlideImg");
-const p2Images=[
-  "Photos/Architektur_1.jpg",
-  "Photos/Architektur_2.jpg",
-  "Photos/Architektur_3.jpg",
-  "Photos/Architektur_4.jpg",
-  "Photos/Architektur_5.jpg",
-  "Photos/Architektur_6.jpg",
-  "Photos/Architektur_7.jpg",
-  "Photos/Architektur_8.jpg",
-  "Photos/Architektur_9.jpg"
-];
-let p2Idx=0;
-let p2Timer=null;
-let p2Active=false;
-let p2Mouse={x:0,y:0};
-let p2SplitDone=false;
-const p2Offset=16;
-const p2Pad=16;
-
-if(p2Slideshow && p2Slideshow.parentElement !== document.body){
-  document.body.appendChild(p2Slideshow);
-}
-
-function positionP2Slideshow(){
-  if(!p2Slideshow) return;
-  const w=p2Slideshow.offsetWidth;
-  const h=p2Slideshow.offsetHeight;
-  let x=p2Mouse.x + p2Offset;
-  let y=p2Mouse.y + p2Offset;
-  x=Math.min(x, innerWidth - w - p2Pad);
-  x=Math.max(p2Pad, x);
-  y=Math.min(y, innerHeight - h - p2Pad);
-  y=Math.max(p2Pad, y);
-  p2Slideshow.style.left=`${x}px`;
-  p2Slideshow.style.top=`${y}px`;
-}
-
-function splitP2Title(){
-  if(!p2Target || p2SplitDone) return;
-  const raw=p2Target.innerHTML.replace(/<br\s*\/?>/gi," \n ");
-  p2Target.innerHTML="";
-  const parts=raw.split(/\s+/).filter(Boolean);
-  let toggle=true;
-  parts.forEach((part,i)=>{
-    if(part==="\\n"){
-      p2Target.appendChild(document.createElement("br"));
-      return;
-    }
-    const span=document.createElement("span");
-    span.className=toggle ? "front" : "back";
-    span.textContent=part;
-    p2Target.appendChild(span);
-    if(i<parts.length-1) p2Target.append(" ");
-    toggle=!toggle;
-  });
-  p2SplitDone=true;
-}
-
-function p2Show(){
-  if(!p2Slideshow || !p2SlideImg) return;
-  splitP2Title();
-  p2Active=true;
-  p2Slideshow.style.visibility="visible";
-  p2Slideshow.style.opacity="1";
-  positionP2Slideshow();
-  p2SlideImg.src=p2Images[p2Idx];
-  p2Idx=(p2Idx+1)%p2Images.length;
-  p2Timer=setInterval(()=>{
-    p2SlideImg.src=p2Images[p2Idx];
-    p2Idx=(p2Idx+1)%p2Images.length;
-  },1600);
-}
-function p2Hide(){
-  if(!p2Slideshow) return;
-  p2Active=false;
-  p2Slideshow.style.opacity="0";
-  p2Slideshow.style.visibility="hidden";
-  clearInterval(p2Timer);
-  p2Timer=null;
-}
-
-if(p2Target){
-  splitP2Title();
-  p2Target.addEventListener("mouseenter",p2Show);
-  p2Target.addEventListener("mouseleave",p2Hide);
-}
-
-addEventListener("mousemove",(e)=>{
-  p2Mouse.x=e.clientX;
-  p2Mouse.y=e.clientY;
-  if(!p2Active || !p2Slideshow) return;
-  positionP2Slideshow();
-});
 </script>
 
 </body>

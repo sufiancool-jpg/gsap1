@@ -23,6 +23,28 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles-phone.css" media="(max-width: 480px)" />
+    <link
+      rel="stylesheet"
+      href="./styles-phone-lg.css"
+      media="(min-width: 481px) and (max-width: 768px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-tablet.css"
+      media="(min-width: 769px) and (max-width: 1024px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-laptop.css"
+      media="(min-width: 1025px) and (max-width: 1440px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-desktop.css"
+      media="(min-width: 1441px) and (max-width: 1920px)"
+    />
+    <link rel="stylesheet" href="./styles-4k.css" media="(min-width: 1921px)" />
   </head>
   <body>
     <header class="site-header" aria-label="Primary">
@@ -85,11 +107,13 @@
             <section class="chapter chapter--p1">
               <div class="wrap">
                 <p class="kicker"></p>
-                <p class="subcopy">
-                  Narrative-driven work with a cinematic backbone.<br>From concept to final cut,
-                  we focus on stories that feel intentional, human, and lasting &mdash; not
-                  disposable.
-                </p>
+                <div class="subcopy-text">
+                  <p class="subcopy">
+                    Narrative-driven work with a cinematic backbone. From concept to final cut,
+                    we focus on stories that feel intentional, human, and lasting &mdash; not
+                    disposable.
+                  </p>
+                </div>
                 <h1>WE MAKE FILMS,<br>NOT CONTENT.</h1>
               </div>
             </section>
@@ -101,6 +125,7 @@
                   Every frame is composed to communicate &mdash; not decorate.
                 </p>
                 <h1 class="p2-title" id="p2Title">IMAGES THAT<br>CARRY WEIGHT.</h1>
+                <div class="p23-window" id="p23Window" aria-hidden="true"></div>
                 <div class="p2-slideshow" id="p2Slideshow" aria-hidden="true">
                   <img id="p2SlideImg" alt="">
                 </div>
@@ -114,7 +139,7 @@
                   &mdash; without noise. From launch concepts to long-tail distribution, everything
                   is intentional.
                 </p>
-                <h1>IDEAS,STRUCTURED TO TRAVEL.</h1>
+                <h1>IDEAS,<br>STRUCTURED TO TRAVEL.</h1>
               </div>
             </section>
             <section class="chapter chapter--p4">
@@ -177,7 +202,7 @@
               <div class="footer-col">
                 <p class="footer-title">Urbanoise</p>
                 <p>Independent media studio</p>
-                <p>Based in Los Angeles, CA</p>
+                <p>Based in Berlin, Germany</p>
               </div>
               <div class="footer-col">
                 <p class="footer-title">Social</p>

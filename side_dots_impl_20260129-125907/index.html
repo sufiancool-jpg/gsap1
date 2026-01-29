@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Urbanoise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=tanker@400&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary">
+      <div class="site-brand">Urbanoise</div>
+      <nav class="nav-links">
+        <a class="nav-button" href="mailto:info@urbanoise.com">
+          <span class="btn-fill" aria-hidden="true"></span>
+          <span class="btn-label">Start a project</span>
+        </a>
+        <a class="nav-button" href="#about">
+          <span class="btn-fill" aria-hidden="true"></span>
+          <span class="btn-label">About us</span>
+        </a>
+      </nav>
+    </header>
+    <div class="matte-frame" aria-hidden="true"></div>
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <section class="stage" id="stage" aria-label="Urbanoise intro">
+          <div class="hero-track">
+            <div class="hero-panel panel-video">
+              <div class="video-frame" aria-label="Urbanoise featured video">
+                <video
+                  class="hero-video"
+                  src="https://sufianararah.com/wp-content/uploads/2025/03/website_1.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                ></video>
+                <div class="video-fallback">Video loading...</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage-overlay">
+            <h1 class="logo logo-button" role="button" tabindex="0" aria-label="Reveal the video">
+              <span class="logo-initial" aria-hidden="true">U</span>
+              <span class="logo-full">Urbanoise</span>
+            </h1>
+            <div class="scroll-cta" aria-hidden="true">
+              <div class="mouse">
+                <span class="wheel"></span>
+              </div>
+              <span class="cta-text">Scroll</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="pillars-section" id="pillars" aria-label="Urbanoise pillars">
+          <div class="bg" aria-hidden="true">
+            <canvas id="bgCanvas"></canvas>
+          </div>
+          <div class="pillars-dots" aria-hidden="true">
+            <div class="dots-container" data-dots-container-init></div>
+          </div>
+          <nav class="status" aria-hidden="true">
+            <div class="status__item is-active" data-i="0"><span class="dot"></span>FILM</div>
+            <div class="status__item" data-i="1"><span class="dot"></span>PHOTOGRAPHY</div>
+            <div class="status__item" data-i="2"><span class="dot"></span>MEDIA CAMPAIGNS</div>
+            <div class="status__item" data-i="3"><span class="dot"></span>CONSULTING</div>
+          </nav>
+          <div class="rail" id="rail">
+            <section class="chapter chapter--p1">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  Narrative-driven work with a cinematic backbone.<br>From concept to final cut,
+                  we focus on stories that feel intentional, human, and lasting &mdash; not
+                  disposable.
+                </p>
+                <h1>WE MAKE FILMS,<br>NOT CONTENT.</h1>
+              </div>
+            </section>
+            <section class="chapter chapter--p2">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  Commercial, editorial, and artistic photography built around clarity and mood.
+                  Every frame is composed to communicate &mdash; not decorate.
+                </p>
+                <h1 class="p2-title" id="p2Title">IMAGES THAT<br>CARRY WEIGHT.</h1>
+                <div class="p2-slideshow" id="p2Slideshow" aria-hidden="true">
+                  <img id="p2SlideImg" alt="">
+                </div>
+              </div>
+            </section>
+            <section class="chapter chapter--p3">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  We design media campaigns that connect strategy, platforms, and audiences
+                  &mdash; without noise. From launch concepts to long-tail distribution, everything
+                  is intentional.
+                </p>
+                <h1>IDEAS,STRUCTURED TO TRAVEL.</h1>
+              </div>
+            </section>
+            <section class="chapter chapter--p4">
+              <div class="wrap">
+                <p class="kicker"></p>
+                <p class="subcopy">
+                  Years in production become a practical compass that directs teams, budgets, and
+                  outcomes.
+                </p>
+                <h1>EXPERIENCE,<br>TURNED INTO DIRECTION.</h1>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="about" id="about" aria-label="About Urbanoise">
+          <div class="about-inner">
+            <div class="about-hero">
+              <p class="about-label eyebrow" data-animate></p>
+              <h2 class="about-title" data-animate>We are Urbanoise.</h2>
+              <p class="about-lead" data-animate>
+                A Berlin-based creative studio. We work at the intersection of film, photography,
+                media, and strategy &mdash; where ideas are shaped, not rushed.
+              </p>
+            </div>
+            <div class="about-grid">
+              <div class="about-col about-col-left" data-animate>
+                <p class="about-body">
+                  We collaborate with brands, institutions, and teams who value clarity over
+                  volume, and longevity over trends. Experience matters. And ours is built through
+                  years of hands-on production, problem-solving, and real-world delivery &mdash; not
+                  theory. To put it simply, we help ideas find their strongest form.
+                </p>
+              </div>
+              <div class="about-col about-col-right">
+                <p class="about-contact" data-animate>
+                  We are always happy to talk and meet new people. Contact us.
+                </p>
+                <p class="about-contact" data-animate>
+                  Give us a call
+                  <a href="tel:+13235550192">+1 (323) 555 0192</a>
+                  or e-mail
+                  <a href="mailto:info@urbanoise.com">info@urbanoise.com</a>
+                </p>
+                <div class="about-portraits" data-animate>
+                  <figure class="about-portrait">
+                    <img src="Photos/suf.jpg" alt="Sufian Ararah" loading="lazy">
+                  </figure>
+                  <figure class="about-portrait">
+                    <img src="Photos/rokas.jpg" alt="Rokas" loading="lazy">
+                  </figure>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <footer class="site-footer" aria-label="Urbanoise footer">
+          <div class="footer-inner">
+            <div class="footer-top">
+              <div class="footer-col">
+                <p class="footer-title">Urbanoise</p>
+                <p>Independent media studio</p>
+                <p>Based in Berlin, Germany</p>
+              </div>
+              <div class="footer-col">
+                <p class="footer-title">Social</p>
+                <p>Instagram</p>
+                <p>LinkedIn</p>
+                <p>Vimeo</p>
+              </div>
+              <div class="footer-col footer-col-center">
+                <p class="footer-title">Contact</p>
+                <p>info@urbanoise.com</p>
+                <p>jobs@urbanoise.com</p>
+                <p>+1 (323) 555 0192</p>
+              </div>
+              <div class="footer-col footer-col-right">
+                <p class="footer-title">Legal</p>
+                <p>Imprint</p>
+                <p>Privacy policy</p>
+                <p>Accessibility</p>
+              </div>
+            </div>
+            <div class="footer-marquee">
+              <span>URBANOISE</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
