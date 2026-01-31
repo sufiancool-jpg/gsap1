@@ -38,24 +38,6 @@ body {
   overflow-x: hidden;
 }
 
-#smooth-wrapper,
-#smooth-content {
-  background: var(--pantone-8245c);
-}
-
-#smooth-wrapper {
-  position: relative;
-  overflow: hidden;
-}
-
-#smooth-content {
-  min-height: 100vh;
-}
-
-#smooth-content > main {
-  min-height: 100vh;
-}
-
 body.scroll-locked {
   overflow: hidden;
   height: 100vh;
@@ -105,19 +87,6 @@ body.is-entered .site-header {
   pointer-events: auto;
 }
 
-body.at-about .site-header {
-  justify-content: flex-end;
-}
-
-body.at-about .site-brand {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-
 .site-brand {
   font-family: var(--font-logo);
   font-weight: 800;
@@ -159,17 +128,6 @@ body.at-about .site-brand {
   outline-offset: 6px;
 }
 
-body.at-about .nav-link {
-  background: #0b0b0b;
-  border-radius: 3px;
-  padding: 0.55rem 1.2rem;
-  letter-spacing: 0.4em;
-}
-
-main {
-  scroll-snap-type: y mandatory;
-}
-
 .stage {
   position: relative;
   min-height: 100vh;
@@ -177,7 +135,6 @@ main {
   background: var(--pantone-8245c);
   perspective: 1200px;
   overflow: hidden;
-  scroll-snap-align: start;
 }
 
 .video-frame {
@@ -470,7 +427,6 @@ main {
   padding: 0;
   color: var(--text-dark);
   min-height: 100vh;
-  scroll-snap-align: start;
 }
 
 .about-grid {
@@ -715,4 +671,3 @@ main {
     padding: clamp(3rem, 5vw, 4rem);
   }
 }
-

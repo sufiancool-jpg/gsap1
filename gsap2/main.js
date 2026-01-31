@@ -1,10 +1,8 @@
 import { gsap } from "./src/index.js";
 import Flip from "./src/Flip.js";
-import ScrollTrigger from "./src/ScrollTrigger.js";
-import ScrollSmoother from "./src/ScrollSmoother.js";
 import ScrollToPlugin from "./src/ScrollToPlugin.js";
 
-gsap.registerPlugin(Flip, ScrollTrigger, ScrollSmoother, ScrollToPlugin);
+gsap.registerPlugin(Flip, ScrollToPlugin);
 window.gsap = gsap;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -43,13 +41,9 @@ const ENTERED_CLASS = "is-entered";
 let entered = false;
 let logoTarget = { x: 0, y: 0, scale: 1 };
 let scrollLockY = 0;
-let atAbout = false;
 let logoIntroDelayTween = null;
 let logoIntroTween = null;
 let enterTween = null;
-let smoother = null;
-let aboutScrollTrigger = null;
-let aboutStackTimeline = null;
 let aboutSlideTween = null;
 
 const lockScroll = () => {
@@ -88,69 +82,6 @@ const showHeaderNow = () => {
     ease: "power2.out",
     overwrite: true,
   });
-};
-
-const setAtAbout = (on) => {
-  atAbout = Boolean(on);
-  body?.classList.toggle("at-about", atAbout);
-  if (!entered || !brand) return;
-  gsap.to(brand, {
-    autoAlpha: atAbout ? 0 : 1,
-    duration: 0.25 * motionFactor,
-    ease: "power2.out",
-    overwrite: true,
-  });
-};
-
-const createAboutScrollTriggers = (scroller = window) => {
-  if (!aboutSection) return;
-
-  aboutScrollTrigger?.kill();
-  aboutStackTimeline?.scrollTrigger?.kill();
-  aboutStackTimeline?.kill();
-
-  aboutStackTimeline = gsap.timeline({
-    defaults: { ease: "power2.out" },
-    scrollTrigger: {
-      trigger: aboutSection,
-      start: "top bottom",
-      end: () => `+=${aboutSection.offsetHeight || window.innerHeight}`,
-      scrub: 0.9 * motionFactor,
-      scroller,
-      onToggle: (self) => setAtAbout(self.isActive),
-      pin: true,
-      pinSpacing: true,
-    },
-  });
-
-  aboutStackTimeline.fromTo(
-    aboutSection,
-    { yPercent: 45, opacity: 0.88 },
-    { yPercent: 0, opacity: 1 },
-    0
-  );
-
-  if (stage) {
-    aboutStackTimeline.to(stage, { yPercent: -10, scale: 0.98, duration: 1 }, 0);
-  }
-
-  aboutScrollTrigger = aboutStackTimeline.scrollTrigger;
-};
-
-const initSmoothScroll = () => {
-  if (smoother) return smoother;
-  const wrapper = document.querySelector("#smooth-wrapper");
-  const content = document.querySelector("#smooth-content");
-  if (!wrapper || !content) return null;
-  smoother = ScrollSmoother.create({
-    wrapper: "#smooth-wrapper",
-    content: "#smooth-content",
-    smooth: 1.1,
-    effects: true,
-  });
-  createAboutScrollTriggers(smoother.wrapper);
-  ScrollTrigger.refresh();
-  return smoother;
 };
 
 const hideBumperNow = () => {
@@ -286,30 +217,33 @@ const animateLogoIntro = () => {
 
   const revealEnterCta = () => {
     if (!enterCta) return;
-    gsap.to(enterCta, {
-      autoAlpha: 1,
-      y: 0,
-      delay: 0.2 * motionFactor,
-      duration: 0.8 * motionFactor,
-      ease: "power3.out",
-      overwrite: true,
-    });
-    gsap.delayedCall(0.3 * motionFactor, pulseCursor);
+    gsap.fromTo(
+      enterCta,
+      { autoAlpha: 0, y: 6 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.35 * motionFactor,
+        ease: "power2.out",
+        overwrite: true,
+      }
+    );
+    gsap.delayedCall(0.2 * motionFactor, pulseCursor);
   };
 
   logoWrap.classList.add("logo--stack");
   logoWrap.classList.remove("logo--row");
 
-  logoIntroDelayTween = gsap.delayedCall(0.05 * motionFactor, () => {
+  logoIntroDelayTween = gsap.delayedCall(0.02 * motionFactor, () => {
     if (entered) return;
     revealLogoLetters();
+    revealEnterCta();
     ensureLogoRow({
-      duration: 3.2 * motionFactor,
+      duration: 2.1 * motionFactor,
       onComplete: () => {
         gsap.set(logoWrap, { autoAlpha: 1 });
         computeLogoTarget();
-        revealEnterCta();
-        gsap.delayedCall(0.4, pulseCursor);
+        gsap.delayedCall(0.25, pulseCursor);
       },
     });
   });
@@ -326,10 +260,6 @@ const ensureFontsReady = () => {
 
 const scrollToTarget = (target) => {
   if (!target) return;
-  if (smoother) {
-    smoother.scrollTo(target, 1.1, "top top");
-    return;
-  }
   gsap.to(window, {
     scrollTo: { y: target, autoKill: false },
     duration: 1.1,
@@ -368,7 +298,6 @@ const enterSite = ({ scrollAfter = false, scrollTarget = null } = {}) => {
         unlockScroll();
         stageOverlay?.setAttribute("aria-hidden", "true");
         showBumperNow();
-        initSmoothScroll();
         if (scrollAfter) {
           const target = scrollTarget || aboutSection;
           gsap.delayedCall(0.1 * motionFactor, () => scrollToTarget(target));
@@ -503,12 +432,12 @@ ensureFontsReady().then(() => computeLogoTarget());
 // Logo intro + CTA reveal
 const queueLogoIntro = () => {
   if (logoIntroPlayed) return;
-  gsap.delayedCall(0.35, () => {
+  gsap.delayedCall(0.18, () => {
     requestAnimationFrame(() => requestAnimationFrame(animateLogoIntro));
   });
 };
 window.addEventListener("load", queueLogoIntro, { once: true });
-setTimeout(queueLogoIntro, 1500);
+setTimeout(queueLogoIntro, 900);
 
 // Enter interactions
   logoButton?.addEventListener("click", () => {
@@ -653,8 +582,6 @@ if (aboutSlideTrack) {
     aboutSlideTrack.appendChild(createSlide(variant));
   });
 }
-createAboutScrollTriggers();
-
 if (aboutVariantButtons.length) {
   aboutVariantButtons.forEach((button) => {
     button.addEventListener("click", () => {
