@@ -56,10 +56,13 @@
       <div class="site-brand">Urbanoise</div>
       <nav class="nav-links">
         <a class="nav-link" href="mailto:info@urbanoise.com">Start a project</a>
+        <a class="nav-link" href="#articles">Articles</a>
         <a class="nav-link" href="#about">About us</a>
       </nav>
     </header>
-    <main>
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <main>
       <section class="stage" id="stage" aria-label="Urbanoise landing">
         <div class="video-frame" aria-label="Urbanoise featured video">
           <video
@@ -107,57 +110,69 @@
       </section>
 
       <section class="about-page" id="about" aria-label="About Urbanoise">
-        <div class="about-split">
-          <div class="about-left">
-            <div class="about-head">
-              <div class="about-we">We are</div>
-              <div class="about-name">URBANOISE</div>
-            </div>
-
-            <p class="about-statement">
-              We believe that moving image holds a great potential to make architecture truly
-              tangible.
-            </p>
-
-            <p class="about-blurb">
-              Through time, movement and sound, spaces can be not only seen, but felt and heard.
-            </p>
-
-            <p class="about-blurb">
-              URBANOISE is a production company founded by cinematographer Sufian Ararah and
-              photographer and architect Rokas Jankus in 2026, dedicated to architectural
-              documentaries in film and photography.
-            </p>
-
-            <p class="about-blurb">
-              At the core of our practice lies observation rather than staging. We document
-              processes, uses, transitions and atmospheres as they unfold, allowing architecture to
-              be understood within its real context.
-            </p>
-
-            <p class="about-blurb">
-              Film is our primary tool for spatial storytelling. Sound, rhythm and movement are
-              integral to our work, as architecture never exists in silence. Photography complements
-              our films where concentration, precision and reduction are required.
-            </p>
-
-            <p class="about-blurb">
-              URBANOISE stands for a documentary and artistic engagement with architecture and urban
-              space. Works that aim not at attention, but at understanding.
-            </p>
+        <div class="about-grid">
+          <div class="about-viewport">
+            <div class="about-slide-track"></div>
           </div>
-
-          <div class="about-right" aria-hidden="true">
-            <img
-              class="about-photo"
-              src="Photos/Architektur_2.jpg"
-              alt=""
-              loading="lazy"
-            />
+          <div class="about-actions">
+            <div class="about-controls" role="group" aria-label="About variants">
+              <button
+                type="button"
+                class="about-variant-button is-active"
+                data-variant="vision"
+                aria-pressed="true"
+              >
+                Vision
+              </button>
+              <button type="button" class="about-variant-button" data-variant="practice" aria-pressed="false">
+                Practice
+              </button>
+              <button type="button" class="about-variant-button" data-variant="process" aria-pressed="false">
+                Process
+              </button>
+              <button type="button" class="about-variant-button" data-variant="culture" aria-pressed="false">
+                Culture
+              </button>
+            </div>
           </div>
         </div>
       </section>
-    </main>
+
+      <section class="articles-section" id="articles" aria-label="Articles">
+        <div class="articles-inner">
+          <div class="articles-heading">
+            <p class="articles-eyebrow">Articles</p>
+            <h2>Filming buildings through thoughtful storytelling.</h2>
+            <p>
+              Weekly notes on the craft of documenting architecture—production tips, behind-the-scenes snapshots,
+              and context on how we photograph light, volume, and rhythm.
+            </p>
+          </div>
+          <div class="articles-grid">
+            <article class="article-card">
+              <p class="article-label">Pillar 1</p>
+              <h3>Film crews that move with the space</h3>
+              <p>How we choreograph camera, sound, and talent so the story unfolds without interrupting the architecture.</p>
+              <button class="article-button">Read article</button>
+            </article>
+            <article class="article-card">
+              <p class="article-label">Pillar 2</p>
+              <h3>Lighting for monumental surfaces</h3>
+              <p>Observing how natural light shifts across façades and using that rhythm to plan each shot.</p>
+              <button class="article-button">Read article</button>
+            </article>
+            <article class="article-card">
+              <p class="article-label">Pillar 3</p>
+              <h3>Architectural music—score, pace, silence</h3>
+              <p>Why we treat every cut like a movement and let quiet spaces breathe instead of filling them with noise.</p>
+              <button class="article-button">Read article</button>
+            </article>
+          </div>
+        </div>
+      </section>
+        </main>
+      </div>
+    </div>
 
     <script type="module" src="./main.js"></script>
   </body>

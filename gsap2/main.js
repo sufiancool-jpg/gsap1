@@ -1,7 +1,10 @@
 import { gsap } from "./src/index.js";
 import Flip from "./src/Flip.js";
+import ScrollTrigger from "./src/ScrollTrigger.js";
+import ScrollSmoother from "./src/ScrollSmoother.js";
+import ScrollToPlugin from "./src/ScrollToPlugin.js";
 
-gsap.registerPlugin(Flip);
+gsap.registerPlugin(Flip, ScrollTrigger, ScrollSmoother, ScrollToPlugin);
 window.gsap = gsap;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -20,6 +23,7 @@ const lettersAno = logo ? [...logo.querySelectorAll(".logo-letter-ano")] : [];
 const lettersIse = logo ? [...logo.querySelectorAll(".logo-letter-ise")] : [];
 const logoButton = document.querySelector(".logo-button");
 
+const stage = document.querySelector(".stage");
 const stageOverlay = document.querySelector(".stage-overlay");
 const enterCta = document.querySelector(".enter-cta");
 
@@ -30,6 +34,8 @@ const scrollBumper = document.querySelector(".scroll-bumper");
 
 const aboutSection = document.querySelector("#about");
 const aboutLink = document.querySelector('a[href="#about"]');
+const articlesSection = document.querySelector("#articles");
+const articlesLink = document.querySelector('a[href="#articles"]');
 
 const LOCK_CLASS = "scroll-locked";
 const ENTERED_CLASS = "is-entered";
@@ -41,6 +47,10 @@ let atAbout = false;
 let logoIntroDelayTween = null;
 let logoIntroTween = null;
 let enterTween = null;
+let smoother = null;
+let aboutScrollTrigger = null;
+let aboutStackTimeline = null;
+let aboutSlideTween = null;
 
 const lockScroll = () => {
   if (!body) return;
@@ -90,6 +100,57 @@ const setAtAbout = (on) => {
     ease: "power2.out",
     overwrite: true,
   });
+};
+
+const createAboutScrollTriggers = (scroller = window) => {
+  if (!aboutSection) return;
+
+  aboutScrollTrigger?.kill();
+  aboutStackTimeline?.scrollTrigger?.kill();
+  aboutStackTimeline?.kill();
+
+  aboutStackTimeline = gsap.timeline({
+    defaults: { ease: "power2.out" },
+    scrollTrigger: {
+      trigger: aboutSection,
+      start: "top bottom",
+      end: () => `+=${aboutSection.offsetHeight || window.innerHeight}`,
+      scrub: 0.9 * motionFactor,
+      scroller,
+      onToggle: (self) => setAtAbout(self.isActive),
+      pin: true,
+      pinSpacing: true,
+    },
+  });
+
+  aboutStackTimeline.fromTo(
+    aboutSection,
+    { yPercent: 45, opacity: 0.88 },
+    { yPercent: 0, opacity: 1 },
+    0
+  );
+
+  if (stage) {
+    aboutStackTimeline.to(stage, { yPercent: -10, scale: 0.98, duration: 1 }, 0);
+  }
+
+  aboutScrollTrigger = aboutStackTimeline.scrollTrigger;
+};
+
+const initSmoothScroll = () => {
+  if (smoother) return smoother;
+  const wrapper = document.querySelector("#smooth-wrapper");
+  const content = document.querySelector("#smooth-content");
+  if (!wrapper || !content) return null;
+  smoother = ScrollSmoother.create({
+    wrapper: "#smooth-wrapper",
+    content: "#smooth-content",
+    smooth: 1.1,
+    effects: true,
+  });
+  createAboutScrollTriggers(smoother.wrapper);
+  ScrollTrigger.refresh();
+  return smoother;
 };
 
 const hideBumperNow = () => {
@@ -254,12 +315,6 @@ const animateLogoIntro = () => {
   });
 };
 
-const scrollToAbout = () => {
-  if (!aboutSection) return;
-  setAtAbout(true);
-  aboutSection.scrollIntoView({ behavior: "smooth", block: "start" });
-};
-
 const ensureFontsReady = () => {
   if (!document.fonts?.ready) return Promise.resolve();
   if (document.fonts.status === "loaded") return Promise.resolve();
@@ -269,9 +324,26 @@ const ensureFontsReady = () => {
   ]);
 };
 
-const enterSite = ({ scrollAfter } = {}) => {
+const scrollToTarget = (target) => {
+  if (!target) return;
+  if (smoother) {
+    smoother.scrollTo(target, 1.1, "top top");
+    return;
+  }
+  gsap.to(window, {
+    scrollTo: { y: target, autoKill: false },
+    duration: 1.1,
+    ease: "power2.out",
+  });
+};
+
+const scrollToAbout = () => {
+  enterSite({ scrollAfter: true, scrollTarget: aboutSection });
+};
+
+const enterSite = ({ scrollAfter = false, scrollTarget = null } = {}) => {
   if (entered) {
-    if (scrollAfter) scrollToAbout();
+    if (scrollAfter) scrollToTarget(scrollTarget || aboutSection);
     return;
   }
   if (enterTween) return;
@@ -296,8 +368,10 @@ const enterSite = ({ scrollAfter } = {}) => {
         unlockScroll();
         stageOverlay?.setAttribute("aria-hidden", "true");
         showBumperNow();
+        initSmoothScroll();
         if (scrollAfter) {
-          gsap.delayedCall(0.1 * motionFactor, scrollToAbout);
+          const target = scrollTarget || aboutSection;
+          gsap.delayedCall(0.1 * motionFactor, () => scrollToTarget(target));
         }
       },
     });
@@ -426,20 +500,6 @@ if (video && fallback) {
 
 ensureFontsReady().then(() => computeLogoTarget());
 
-if (aboutSection && "IntersectionObserver" in window) {
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      setAtAbout(entry.isIntersecting);
-    },
-    {
-      root: null,
-      threshold: 0,
-      rootMargin: "0px 0px -90% 0px",
-    }
-  );
-  observer.observe(aboutSection);
-}
-
 // Logo intro + CTA reveal
 const queueLogoIntro = () => {
   if (logoIntroPlayed) return;
@@ -473,7 +533,135 @@ aboutLink?.addEventListener("click", (event) => {
   enterSite({ scrollAfter: true });
 });
 
+articlesLink?.addEventListener("click", (event) => {
+  event.preventDefault();
+  enterSite({ scrollAfter: true, scrollTarget: articlesSection });
+});
+
 // Keep target updated on resize
 window.addEventListener("resize", () => {
   if (!entered) computeLogoTarget();
 });
+
+const aboutSlideTrack = document.querySelector(".about-slide-track");
+const aboutVariantButtons = Array.from(document.querySelectorAll(".about-variant-button"));
+const aboutVariants = [
+  {
+    key: "vision",
+    lead: "We believe that moving images hold a great potential to make architecture truly tangible.",
+    paragraphs: [
+      "URBANOISE is a production company founded by director/cinematographer Sufian Ararah and photographer and architect Rokas Jankus in 2026, dedicated to architectural documentaries in film and photography.",
+      "At the core of our practice lies observation rather than staging. We document processes, uses, transitions and atmospheres as they unfold, allowing architecture to be understood within its real context.",
+      "URBANOISE stands for a documentary and artistic engagement with architecture and urban space. Works that aim not at attention, but at understanding.",
+    ],
+    image: "Photos/us2.JPG",
+    alt: "Urbanoise founders portrait",
+  },
+  {
+    key: "practice",
+    lead: "Our cameras move with architecture rather than impose a narrative on it.",
+    paragraphs: [
+      "From research to set design, every shoot is built around how spaces are actually used.",
+      "We collaborate with architects, clients, and production partners to choreograph days that respect the material while moving efficiently.",
+      "The resulting films and stills stay true to the feel of the place, letting light, texture, and rhythm speak for themselves.",
+    ],
+    image: "Photos/work4.jpg",
+    alt: "Film crew capturing architectural detail",
+  },
+  {
+    key: "process",
+    lead: "Every assignment begins with listening to the space and the people inhabiting it.",
+    paragraphs: [
+      "We document processes, transitions, and atmospheres so architecture can be seen in motion.",
+      "Once the first assembly is drafted, we refine pacing, sound, and rhythm until the story feels inevitable.",
+      "Long-form films and still photography alike are delivered with practical documentation so teams retain control over the narrative.",
+    ],
+    image: "Photos/work5.jpg",
+    alt: "Architectural space framed by cinematography lighting",
+  },
+  {
+    key: "culture",
+    lead: "We balance curiosity with discipline and keep the studio intentionally small.",
+    paragraphs: [
+      "We travel lightly and stay nimble so we can respond to real-time shifts.",
+      "Experimentation is welcomed, but every decision is grounded in craft and focus.",
+      "Patience, listening, and a hunger for texture define how we live the work.",
+    ],
+    image: "Photos/work6.jpg",
+    alt: "Urbanoise team working on location",
+  },
+];
+
+const updateVariantButtons = (activeKey) => {
+  aboutVariantButtons.forEach((button) => {
+    const isActive = button.dataset.variant === activeKey;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+};
+
+const setAboutVariant = (variantKey, { animate = true } = {}) => {
+  const index = aboutVariants.findIndex((variant) => variant.key === variantKey);
+  if (index === -1 || !aboutSlideTrack) return;
+
+  const xPercent = -100 * index;
+  updateVariantButtons(variantKey);
+
+  if (!animate) {
+    gsap.set(aboutSlideTrack, { xPercent });
+    return;
+  }
+
+  if (aboutSlideTween) {
+    aboutSlideTween.kill();
+  }
+  aboutSlideTween = gsap.to(aboutSlideTrack, {
+    xPercent,
+    duration: 0.75,
+    ease: "power2.inOut",
+  });
+};
+
+const createSlide = (variant) => {
+  const slide = document.createElement("article");
+  slide.className = "about-slide";
+  const paragraphs = variant.paragraphs
+    .map((paragraph) => `<p class="about-paragraph">${paragraph}</p>`)
+    .join("");
+  slide.innerHTML = `
+    <div class="about-slide-text">
+      <p class="about-eyebrow">About</p>
+      <h2 class="about-title">
+        We are <span class="about-title-brand">Urbanoise</span>.
+      </h2>
+      <p class="about-lead">${variant.lead}</p>
+      <div class="about-copy">
+        ${paragraphs}
+      </div>
+    </div>
+    <div class="about-slide-image">
+      <div class="about-photo-wrapper">
+        <img class="about-photo" src="${variant.image}" alt="${variant.alt}" loading="lazy" />
+      </div>
+    </div>
+  `;
+  return slide;
+};
+
+if (aboutSlideTrack) {
+  aboutVariants.forEach((variant) => {
+    aboutSlideTrack.appendChild(createSlide(variant));
+  });
+}
+createAboutScrollTriggers();
+
+if (aboutVariantButtons.length) {
+  aboutVariantButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const variantKey = button.dataset.variant;
+      if (!variantKey) return;
+      setAboutVariant(variantKey);
+    });
+  });
+}
+setAboutVariant("vision", { animate: false });
