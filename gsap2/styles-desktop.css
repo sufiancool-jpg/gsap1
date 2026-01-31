@@ -1,0 +1,18 @@
+/* Desktop overrides (1441px–1920px). */
+
+.site-header {
+  left: 2.6rem;
+  right: 2.6rem;
+}
+
+.site-brand {
+  font-size: 1.35rem;
+}
+
+.nav-link {
+  font-size: 0.82rem;
+}
+
+.about-split {
+  grid-template-columns: 1fr 1fr;
+}

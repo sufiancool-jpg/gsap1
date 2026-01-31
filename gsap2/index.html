@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Urbanoise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=tanker@400&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles-phone.css" media="(max-width: 480px)" />
+    <link
+      rel="stylesheet"
+      href="./styles-phone-lg.css"
+      media="(min-width: 481px) and (max-width: 768px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-tablet.css"
+      media="(min-width: 769px) and (max-width: 1024px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-laptop.css"
+      media="(min-width: 1025px) and (max-width: 1440px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-13inch.css"
+      media="(width: 1440px) and (min-height: 699px) and (max-height: 730px)"
+    />
+    <link
+      rel="stylesheet"
+      href="./styles-desktop.css"
+      media="(min-width: 1441px) and (max-width: 1920px)"
+    />
+    <link rel="stylesheet" href="./styles-4k.css" media="(min-width: 1921px)" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary">
+      <div class="site-brand">Urbanoise</div>
+      <nav class="nav-links">
+        <a class="nav-link" href="mailto:info@urbanoise.com">Start a project</a>
+        <a class="nav-link" href="#about">About us</a>
+      </nav>
+    </header>
+    <main>
+      <section class="stage" id="stage" aria-label="Urbanoise landing">
+        <div class="video-frame" aria-label="Urbanoise featured video">
+          <video
+            class="hero-video"
+            src="https://sufianararah.com/wp-content/uploads/2025/03/website_1.mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+          ></video>
+          <div class="video-fallback" aria-hidden="true"></div>
+          <button class="scroll-bumper" type="button" aria-label="Scroll down to About us">
+            Scroll down
+          </button>
+        </div>
+
+        <div class="stage-overlay">
+          <h1 class="logo logo-button" role="button" tabindex="0" aria-label="Enter Urbanoise">
+            <span class="sr-only">Urbanoise</span>
+            <span class="logo-wrap logo--stack" aria-hidden="true">
+              <span class="logo-letter logo-letter-urb">U</span>
+              <span class="logo-letter logo-letter-urb">R</span>
+              <span class="logo-letter logo-letter-urb">B</span>
+              <span class="logo-letter logo-letter-ano">A</span>
+              <span class="logo-letter logo-letter-ano">N</span>
+              <span class="logo-letter logo-letter-ano">O</span>
+              <span class="logo-letter logo-letter-ise">I</span>
+              <span class="logo-letter logo-letter-ise">S</span>
+              <span class="logo-letter logo-letter-ise">E</span>
+            </span>
+          </h1>
+
+          <button class="enter-cta" type="button" aria-label="Click to enter">
+            <span class="cursor-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path
+                  d="M12 6l26 24-11 1.5 5.2 10.8-4.2 1.9-5.2-10.8-8.6 7.1L12 6Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </span>
+            <span class="cta-text">Click to enter</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="about-page" id="about" aria-label="About Urbanoise">
+        <div class="about-split">
+          <div class="about-left">
+            <div class="about-head">
+              <div class="about-we">We are</div>
+              <div class="about-name">URBANOISE</div>
+            </div>
+
+            <p class="about-statement">
+              We believe that moving image holds a great potential to make architecture truly
+              tangible.
+            </p>
+
+            <p class="about-blurb">
+              Through time, movement and sound, spaces can be not only seen, but felt and heard.
+            </p>
+
+            <p class="about-blurb">
+              URBANOISE is a production company founded by cinematographer Sufian Ararah and
+              photographer and architect Rokas Jankus in 2026, dedicated to architectural
+              documentaries in film and photography.
+            </p>
+
+            <p class="about-blurb">
+              At the core of our practice lies observation rather than staging. We document
+              processes, uses, transitions and atmospheres as they unfold, allowing architecture to
+              be understood within its real context.
+            </p>
+
+            <p class="about-blurb">
+              Film is our primary tool for spatial storytelling. Sound, rhythm and movement are
+              integral to our work, as architecture never exists in silence. Photography complements
+              our films where concentration, precision and reduction are required.
+            </p>
+
+            <p class="about-blurb">
+              URBANOISE stands for a documentary and artistic engagement with architecture and urban
+              space. Works that aim not at attention, but at understanding.
+            </p>
+          </div>
+
+          <div class="about-right" aria-hidden="true">
+            <img
+              class="about-photo"
+              src="Photos/Architektur_2.jpg"
+              alt=""
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

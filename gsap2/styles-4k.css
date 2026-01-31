@@ -1,0 +1,42 @@
+/* 4K overrides (1921px+). */
+
+.site-header {
+  top: 2.4rem;
+  left: 3.4rem;
+  right: 3.4rem;
+}
+
+.site-brand {
+  font-size: 1.75rem;
+}
+
+.nav-link {
+  font-size: 0.95rem;
+}
+
+.enter-cta {
+  bottom: 3.8rem;
+}
+
+.scroll-bumper {
+  bottom: 2.6rem;
+  min-width: 300px;
+  height: 62px;
+  font-size: 0.9rem;
+}
+
+.about-left {
+  padding: 5.5rem 5.2rem 4.2rem;
+}
+
+.about-we {
+  font-size: 4.6rem;
+}
+
+.about-name {
+  font-size: 4.5rem;
+}
+
+.about-statement {
+  font-size: clamp(2.6rem, 2.6vw, 4.1rem);
+}

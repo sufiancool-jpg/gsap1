@@ -1,0 +1,72 @@
+/* Phone overrides (max-width: 480px). */
+
+.site-header {
+  top: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+}
+
+.site-brand {
+  font-size: 1.1rem;
+}
+
+.nav-links {
+  gap: 1.25rem;
+}
+
+.nav-link {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+}
+
+.enter-cta {
+  bottom: 2.2rem;
+}
+
+.cursor-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.cta-text {
+  font-size: 0.68rem;
+}
+
+.scroll-bumper {
+  bottom: 1.35rem;
+  min-width: 210px;
+  height: 50px;
+  font-size: 0.7rem;
+}
+
+.about-split {
+  grid-template-columns: 1fr 1fr;
+}
+
+.about-left {
+  min-height: auto;
+  padding: 3rem 1.75rem 2.25rem;
+}
+
+.about-right {
+  min-height: 55vh;
+}
+
+.about-we {
+  font-size: 2.65rem;
+}
+
+.about-name {
+  font-size: 2.55rem;
+}
+
+.about-statement {
+  margin-top: 2.4rem;
+  font-size: clamp(1.65rem, 6vw, 2.2rem);
+  max-width: 22ch;
+}
+
+.about-blurb {
+  max-width: 48ch;
+  font-size: 0.82rem;
+}

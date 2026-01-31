@@ -806,15 +806,15 @@ if (horizSection && horizContainer && panels.length) {
       });
 
     const frameSources = [
-      "./photos/Architektur_1.jpg",
-      "./photos/Architektur_2.jpg",
-      "./photos/Architektur_3.jpg",
-      "./photos/Architektur_4.jpg",
-      "./photos/Architektur_5.jpg",
-      "./photos/Architektur_6.jpg",
-      "./photos/Architektur_7.jpg",
-      "./photos/Architektur_8.jpg",
-      "./photos/Architektur_9.jpg",
+      "Photos/Architektur_1.jpg",
+      "Photos/Architektur_2.jpg",
+      "Photos/Architektur_3.jpg",
+      "Photos/Architektur_4.jpg",
+      "Photos/Architektur_5.jpg",
+      "Photos/Architektur_6.jpg",
+      "Photos/Architektur_7.jpg",
+      "Photos/Architektur_8.jpg",
+      "Photos/Architektur_9.jpg",
     ];
     let frameIndex = 0;
     const updateFrame = () => {
@@ -981,7 +981,7 @@ if (pillarsSection && pillarsRail) {
     }
   };
   const p1Subcopy = pillarsSection.querySelector(".chapter--p1 .subcopy");
-  const p23Frames = [
+  const defaultP23Frames = [
     "Photos/nyc/feedthegreed.jpg",
     "Photos/nyc/nyc.jpg",
     "Photos/nyc/nyc-01(1).jpg",
@@ -1020,19 +1020,57 @@ if (pillarsSection && pillarsRail) {
     "Photos/nyc/RJ390300.jpg",
     "Photos/nyc/RJ404959.jpg",
   ];
+  let p23Frames = [...defaultP23Frames];
   let p23Idx = 0;
   let p23Timer = null;
   let p23Interval = 0;
   const p23DefaultInterval = 1400;
   const p23HoverInterval = 1800;
+  const normalizeP23Frames = (frames) =>
+    frames
+      .filter(Boolean)
+      .map((frame) => {
+        if (frame.startsWith("Photos/")) return frame;
+        if (frame.startsWith("./Photos/")) return frame.slice(2);
+        if (frame.startsWith("nyc/")) return `Photos/${frame}`;
+        if (!frame.includes("/")) return `Photos/nyc/${frame}`;
+        return frame;
+      });
+  const applyP23Frames = (frames) => {
+    const normalized = normalizeP23Frames(frames);
+    if (!normalized.length) return;
+    p23Frames = normalized;
+    p23Idx = 0;
+    setP23Frame(p23Frames[0]);
+  };
+  const setP23Frame = (frame) => {
+    if (!p23Window || !frame) return;
+    p23Window.style.backgroundImage = `url("${frame}")`;
+  };
   const updateP23Frame = () => {
     if (!p23Window) return;
+    if (!p23Frames.length) return;
     const frame = p23Frames[p23Idx];
-    p23Window.style.backgroundImage = `url(${frame})`;
+    setP23Frame(frame);
     p23Idx = (p23Idx + 1) % p23Frames.length;
   };
+  const loadP23Frames = async () => {
+    try {
+      const res = await fetch("Photos/nyc/manifest.json", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      const frames = Array.isArray(data) ? data : Array.isArray(data.frames) ? data.frames : [];
+      applyP23Frames(frames);
+    } catch (_err) {
+      // Fallback to default list if manifest is missing or blocked.
+    }
+  };
   const startP23 = (interval = p23DefaultInterval) => {
-    if (prefersReducedMotion || !p23Window) return;
+    if (!p23Window) return;
+    if (prefersReducedMotion) {
+      if (p23Frames.length) setP23Frame(p23Frames[0]);
+      return;
+    }
     if (p23Timer && p23Interval === interval) return;
     stopP23();
     p23Interval = interval;
@@ -1046,6 +1084,8 @@ if (pillarsSection && pillarsRail) {
   };
 
   if (p23Window && p23Wrap) {
+    if (p23Frames.length) setP23Frame(p23Frames[0]);
+    loadP23Frames();
     p23Window.addEventListener("mouseenter", () => {
       p23HoverExpand = true;
       cacheP23Base();
