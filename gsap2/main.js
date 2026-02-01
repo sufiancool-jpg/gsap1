@@ -745,6 +745,21 @@ const updateVariantButtons = (activeKey) => {
   });
 };
 
+const aboutPhoneLabel = document.querySelector(".about-phone-label");
+const aboutPhonePrev = document.querySelector(".about-phone-prev");
+const aboutPhoneNext = document.querySelector(".about-phone-next");
+
+const getVariantLabel = (key) => {
+  const button = aboutVariantButtons.find((btn) => btn.dataset.variant === key);
+  return button ? button.textContent.trim() : key;
+};
+
+const updatePhoneLabel = () => {
+  if (!aboutPhoneLabel) return;
+  const key = aboutVariants[aboutActiveIndex]?.key;
+  aboutPhoneLabel.textContent = getVariantLabel(key);
+};
+
 let aboutActiveIndex = 0;
 const setAboutVariant = (index, { animate = true } = {}) => {
   if (!aboutSlideTrack) return;
@@ -753,6 +768,7 @@ const setAboutVariant = (index, { animate = true } = {}) => {
 
   const xPercent = -100 * clampedIndex;
   updateVariantButtons(aboutVariants[clampedIndex]?.key);
+  updatePhoneLabel();
 
   if (!animate) {
     gsap.set(aboutSlideTrack, { xPercent });
@@ -993,4 +1009,10 @@ if (aboutVariantButtons.length) {
     });
   });
 }
+aboutPhonePrev?.addEventListener("click", () => {
+  setAboutVariant(aboutActiveIndex - 1);
+});
+aboutPhoneNext?.addEventListener("click", () => {
+  setAboutVariant(aboutActiveIndex + 1);
+});
 setAboutVariant(0, { animate: false });
