@@ -36,12 +36,24 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  scroll-snap-type: y mandatory;
 }
 
 body.scroll-locked {
   overflow: hidden;
   height: 100vh;
   overscroll-behavior: none;
+}
+
+main {
+  scroll-snap-type: y mandatory;
+}
+
+.stage,
+.about-page,
+.mockup-page,
+.footer-page {
+  scroll-snap-align: start;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -459,7 +471,9 @@ body.at-about .site-brand {
   min-height: 100vh;
   height: 100vh;
   display: grid;
-  grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+  grid-template-columns:
+    minmax(0, calc(100% - clamp(40vw, 50vw, 60vw)))
+    clamp(40vw, 50vw, 60vw);
   column-gap: 0;
   align-items: stretch;
   background: var(--pantone-8245c);
