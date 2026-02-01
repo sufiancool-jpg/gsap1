@@ -17,7 +17,8 @@
 }
 
 .about-paragraph {
-  font-size: clamp(0.8rem, 1.4vw, 1rem);
+  font-size: clamp(0.7rem, 1.1vw, 0.95rem);
+  line-height: 1.5;
 }
 
 .about-actions {
