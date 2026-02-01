@@ -32,8 +32,7 @@ const scrollBumper = document.querySelector(".scroll-bumper");
 
 const aboutSection = document.querySelector("#about");
 const aboutLink = document.querySelector('a[href="#about"]');
-const articlesSection = document.querySelector("#articles");
-const articlesLink = document.querySelector('a[href="#articles"]');
+const footerBackLink = document.querySelector('a[href="#stage"]');
 
 const LOCK_CLASS = "scroll-locked";
 const ENTERED_CLASS = "is-entered";
@@ -45,6 +44,7 @@ let logoIntroDelayTween = null;
 let logoIntroTween = null;
 let enterTween = null;
 let aboutSlideTween = null;
+let aboutObserver = null;
 
 const lockScroll = () => {
   if (!body) return;
@@ -82,6 +82,37 @@ const showHeaderNow = () => {
     ease: "power2.out",
     overwrite: true,
   });
+};
+
+const setAtAbout = (on) => {
+  const isActive = Boolean(on);
+  body?.classList.toggle("at-about", isActive);
+  if (!brand) return;
+  gsap.to(brand, {
+    autoAlpha: isActive ? 0 : 1,
+    duration: 0.2 * motionFactor,
+    ease: "power2.out",
+    overwrite: true,
+  });
+};
+
+const initAboutObserver = () => {
+  if (!aboutSection || !("IntersectionObserver" in window)) return;
+  aboutObserver?.disconnect();
+  aboutObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.target !== aboutSection) return;
+        setAtAbout(entry.isIntersecting);
+      });
+    },
+    {
+      root: null,
+      rootMargin: "-30% 0px -40% 0px",
+      threshold: 0.01,
+    }
+  );
+  aboutObserver.observe(aboutSection);
 };
 
 const hideBumperNow = () => {
@@ -209,6 +240,20 @@ const ensureLogoRow = ({ duration = 1.0, onComplete } = {}) => {
   return logoIntroTween;
 };
 
+const forceLogoRowState = () => {
+  if (!logoWrap) return;
+  logoIntroDelayTween?.kill();
+  logoIntroDelayTween = null;
+  logoIntroTween?.kill();
+  logoIntroTween = null;
+  gsap.set(logoLetters, { clearProps: "transform" });
+  logoWrap.classList.remove("logo--stack");
+  logoWrap.classList.add("logo--row");
+  logoWrap.style.width = "";
+  logoWrap.style.height = "";
+  gsap.set(logoWrap, { autoAlpha: 1, clearProps: "transform" });
+};
+
 let logoIntroPlayed = false;
 const animateLogoIntro = () => {
   if (logoIntroPlayed) return;
@@ -239,7 +284,7 @@ const animateLogoIntro = () => {
     revealLogoLetters();
     revealEnterCta();
     ensureLogoRow({
-      duration: 2.1 * motionFactor,
+      duration: 1.6 * motionFactor,
       onComplete: () => {
         gsap.set(logoWrap, { autoAlpha: 1 });
         computeLogoTarget();
@@ -258,33 +303,40 @@ const ensureFontsReady = () => {
   ]);
 };
 
-const scrollToTarget = (target) => {
+const scrollToTarget = (target, offset = 0) => {
   if (!target) return;
+  const y =
+    typeof target === "number"
+      ? target + offset
+      : (target?.offsetTop ?? 0) + offset;
   gsap.to(window, {
-    scrollTo: { y: target, autoKill: false },
+    scrollTo: { y, autoKill: false },
     duration: 1.1,
     ease: "power2.out",
   });
 };
 
 const scrollToAbout = () => {
-  enterSite({ scrollAfter: true, scrollTarget: aboutSection });
+  enterSite({ scrollAfter: true, scrollTarget: aboutSection, scrollOffset: 10 });
 };
 
-const enterSite = ({ scrollAfter = false, scrollTarget = null } = {}) => {
+const enterSite = ({ scrollAfter = false, scrollTarget = null, scrollOffset = 0 } = {}) => {
   if (entered) {
-    if (scrollAfter) scrollToTarget(scrollTarget || aboutSection);
+    if (scrollAfter) scrollToTarget(scrollTarget || aboutSection, scrollOffset);
     return;
   }
   if (enterTween) return;
 
   const startEnter = () => {
+    const introIsActive =
+      Boolean(logoIntroDelayTween) || Boolean(logoIntroTween && logoIntroTween.isActive());
+    if (introIsActive) {
+      forceLogoRowState();
+    }
     entered = true;
     body?.classList.add(ENTERED_CLASS);
     revealLogoLetters();
 
-    const introIsActive =
-      Boolean(logoIntroDelayTween) || Boolean(logoIntroTween && logoIntroTween.isActive());
     const needsRow = logoWrap?.classList.contains("logo--stack") || introIsActive;
     const heroRevealDuration = 1.35 * motionFactor;
     const rowDuration = 0.95 * motionFactor;
@@ -300,7 +352,8 @@ const enterSite = ({ scrollAfter = false, scrollTarget = null } = {}) => {
         showBumperNow();
         if (scrollAfter) {
           const target = scrollTarget || aboutSection;
-          gsap.delayedCall(0.1 * motionFactor, () => scrollToTarget(target));
+          const offset = scrollOffset || 0;
+          gsap.delayedCall(0.1 * motionFactor, () => scrollToTarget(target, offset));
         }
       },
     });
@@ -428,6 +481,7 @@ if (video && fallback) {
 }
 
 ensureFontsReady().then(() => computeLogoTarget());
+initAboutObserver();
 
 // Logo intro + CTA reveal
 const queueLogoIntro = () => {
@@ -459,67 +513,38 @@ scrollBumper?.addEventListener("click", scrollToAbout);
 // Header about link
 aboutLink?.addEventListener("click", (event) => {
   event.preventDefault();
-  enterSite({ scrollAfter: true });
+  enterSite({ scrollAfter: true, scrollOffset: 10 });
 });
 
-articlesLink?.addEventListener("click", (event) => {
+footerBackLink?.addEventListener("click", (event) => {
   event.preventDefault();
-  enterSite({ scrollAfter: true, scrollTarget: articlesSection });
+  scrollToTarget(stage || "#stage");
 });
+
 
 // Keep target updated on resize
 window.addEventListener("resize", () => {
   if (!entered) computeLogoTarget();
 });
 
+
 const aboutSlideTrack = document.querySelector(".about-slide-track");
 const aboutVariantButtons = Array.from(document.querySelectorAll(".about-variant-button"));
-const aboutVariants = [
-  {
-    key: "vision",
-    lead: "We believe that moving images hold a great potential to make architecture truly tangible.",
-    paragraphs: [
-      "URBANOISE is a production company founded by director/cinematographer Sufian Ararah and photographer and architect Rokas Jankus in 2026, dedicated to architectural documentaries in film and photography.",
-      "At the core of our practice lies observation rather than staging. We document processes, uses, transitions and atmospheres as they unfold, allowing architecture to be understood within its real context.",
-      "URBANOISE stands for a documentary and artistic engagement with architecture and urban space. Works that aim not at attention, but at understanding.",
-    ],
-    image: "Photos/us2.JPG",
-    alt: "Urbanoise founders portrait",
-  },
-  {
-    key: "practice",
-    lead: "Our cameras move with architecture rather than impose a narrative on it.",
-    paragraphs: [
-      "From research to set design, every shoot is built around how spaces are actually used.",
-      "We collaborate with architects, clients, and production partners to choreograph days that respect the material while moving efficiently.",
-      "The resulting films and stills stay true to the feel of the place, letting light, texture, and rhythm speak for themselves.",
-    ],
-    image: "Photos/work4.jpg",
-    alt: "Film crew capturing architectural detail",
-  },
-  {
-    key: "process",
-    lead: "Every assignment begins with listening to the space and the people inhabiting it.",
-    paragraphs: [
-      "We document processes, transitions, and atmospheres so architecture can be seen in motion.",
-      "Once the first assembly is drafted, we refine pacing, sound, and rhythm until the story feels inevitable.",
-      "Long-form films and still photography alike are delivered with practical documentation so teams retain control over the narrative.",
-    ],
-    image: "Photos/work5.jpg",
-    alt: "Architectural space framed by cinematography lighting",
-  },
-  {
-    key: "culture",
-    lead: "We balance curiosity with discipline and keep the studio intentionally small.",
-    paragraphs: [
-      "We travel lightly and stay nimble so we can respond to real-time shifts.",
-      "Experimentation is welcomed, but every decision is grounded in craft and focus.",
-      "Patience, listening, and a hunger for texture define how we live the work.",
-    ],
-    image: "Photos/work6.jpg",
-    alt: "Urbanoise team working on location",
-  },
-];
+const aboutBaseVariant = {
+  lead: "We believe that moving images hold a great potential to make architecture truly tangible.",
+  paragraphs: [
+    "URBANOISE is a production company founded by director/cinematographer Sufian Ararah and photographer and architect Rokas Jankus in 2026, dedicated to architectural documentaries in film and photography.",
+    "At the core of our practice lies observation rather than staging. We document processes, uses, transitions and atmospheres as they unfold, allowing architecture to be understood within its real context.",
+    "URBANOISE stands for a documentary and artistic engagement with architecture and urban space. Works that aim not at attention, but at understanding.",
+  ],
+  image: "Photos/us2.JPG",
+  alt: "Urbanoise founders portrait",
+};
+
+const aboutVariants = ["vision", "practice", "process", "culture"].map((key) => ({
+  key,
+  ...aboutBaseVariant,
+}));
 
 const updateVariantButtons = (activeKey) => {
   aboutVariantButtons.forEach((button) => {
@@ -529,12 +554,14 @@ const updateVariantButtons = (activeKey) => {
   });
 };
 
-const setAboutVariant = (variantKey, { animate = true } = {}) => {
-  const index = aboutVariants.findIndex((variant) => variant.key === variantKey);
-  if (index === -1 || !aboutSlideTrack) return;
+let aboutActiveIndex = 0;
+const setAboutVariant = (index, { animate = true } = {}) => {
+  if (!aboutSlideTrack) return;
+  const clampedIndex = ((index % aboutVariants.length) + aboutVariants.length) % aboutVariants.length;
+  aboutActiveIndex = clampedIndex;
 
-  const xPercent = -100 * index;
-  updateVariantButtons(variantKey);
+  const xPercent = -100 * clampedIndex;
+  updateVariantButtons(aboutVariants[clampedIndex]?.key);
 
   if (!animate) {
     gsap.set(aboutSlideTrack, { xPercent });
@@ -585,10 +612,8 @@ if (aboutSlideTrack) {
 if (aboutVariantButtons.length) {
   aboutVariantButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const variantKey = button.dataset.variant;
-      if (!variantKey) return;
-      setAboutVariant(variantKey);
+      setAboutVariant(aboutActiveIndex + 1);
     });
   });
 }
-setAboutVariant("vision", { animate: false });
+setAboutVariant(0, { animate: false });

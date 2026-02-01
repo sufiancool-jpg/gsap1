@@ -5,7 +5,7 @@
   --text-dark: #0b0b0b;
   --muted: rgba(255, 255, 255, 0.7);
   --font-logo: "Cabinet Grotesk", "Space Grotesk", sans-serif;
-  --logo-letter-spacing: 0em;
+  --logo-letter-spacing: -0.09em;
   --logo-urb-x: 0em;
   --logo-urb-y: 0.01em;
   --logo-urb-letter: 0.02em;
@@ -97,10 +97,16 @@ body.is-entered .site-header {
   color: #fff;
 }
 
+body.at-about .site-brand {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 2.25rem;
+  gap: 1.25rem;
 }
 
 .nav-link {
@@ -108,8 +114,8 @@ body.is-entered .site-header {
   text-decoration: none;
   font-family: var(--font-head);
   font-weight: 500;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   padding: 0.45rem 1rem;
   background: transparent;
@@ -117,10 +123,7 @@ body.is-entered .site-header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.25s ease, transform 0.2s ease;
-}
-.nav-link:hover {
-  transform: translateY(-1px);
+  transition: background 0.25s ease;
 }
 
 .nav-link:focus-visible {
@@ -179,9 +182,9 @@ body.is-entered .site-header {
 .logo {
   font-family: var(--font-logo);
   font-weight: 800;
-  font-size: clamp(2.2rem, 7vw, 6rem);
-  letter-spacing: var(--logo-letter-spacing);
-  line-height: 1;
+  font-size: 100px;
+  letter-spacing: 0em;
+  line-height: 0.0;
   text-transform: uppercase;
   margin: 0;
   color: #fff;
@@ -190,6 +193,7 @@ body.is-entered .site-header {
   position: relative;
   display: grid;
   place-items: center;
+  text-align: center;
   will-change: transform;
 }
 
@@ -400,10 +404,10 @@ body.is-entered .site-header {
   min-width: 240px;
   height: 54px;
   padding: 0 1.35rem;
-  border: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
   border-radius: 0;
-  background: #fff;
-  color: var(--text-dark);
+  background: transparent;
+  color: #fff;
   font-family: var(--font-head);
   font-weight: 500;
   font-size: 0.78rem;
@@ -427,6 +431,7 @@ body.is-entered .site-header {
   padding: 0;
   color: var(--text-dark);
   min-height: 100vh;
+  scroll-margin-top: 10px;
 }
 
 .about-grid {
@@ -435,20 +440,22 @@ body.is-entered .site-header {
 }
 
 .about-viewport {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   min-height: 100vh;
 }
 
 .about-slide-track {
   display: flex;
-  width: 400%;
-  min-height: 100vh;
+  width: 100%;
+  min-height: 100%;
   will-change: transform;
 }
 
 .about-slide {
-  width: 100%;
+  flex: 0 0 100%;
   min-height: 100vh;
+  height: auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
@@ -511,20 +518,22 @@ body.is-entered .site-header {
 
 .about-actions {
   position: absolute;
-  bottom: clamp(2rem, 4vw, 3rem);
-  left: clamp(1.5rem, 4vw, 3rem);
-  width: min(520px, calc(50vw - clamp(1.5rem, 4vw, 3rem)));
-  padding-top: clamp(1rem, 2vw, 1.5rem);
+  bottom: clamp(3rem, 6vw, 4.5rem);
+  left: 0;
+  width: 50%;
+  padding-top: clamp(0.5rem, 1.5vw, 1rem);
   display: flex;
   justify-content: center;
 }
 
 .about-controls {
   width: 100%;
+  padding-inline: clamp(1.5rem, 4vw, 3rem);
   margin: 0;
   display: flex;
-  gap: clamp(0.5rem, 1vw, 0.85rem);
+  gap: clamp(0.5rem, 1.2vw, 1rem);
   flex-wrap: nowrap;
+  justify-content: center;
 }
 
 .about-variant-button {
@@ -536,11 +545,11 @@ body.is-entered .site-header {
   font-size: 0.65rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  padding: 0.55rem 0.95rem;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  flex: 1;
-  min-width: 0;
+  flex: 0 1 auto;
+  min-width: clamp(5.5rem, 10vw, 7rem);
   text-align: center;
 }
 
@@ -632,6 +641,53 @@ body.is-entered .site-header {
 .article-button:hover {
   background: #1c1c1c;
   transform: translateY(-1px);
+}
+
+.footer-page {
+  min-height: 100vh;
+  background: var(--pantone-8245c);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #fff;
+}
+
+.footer-inner {
+  display: grid;
+  place-items: center;
+  gap: 1.5rem;
+}
+
+.footer-title {
+  font-family: var(--font-logo);
+  font-weight: 800;
+  font-size: 200px;
+  letter-spacing: 0em;
+  text-transform: uppercase;
+  line-height: 0.6;
+  margin: 0;
+  display: grid;
+  gap: 0;
+  text-align: center;
+}
+
+.footer-title span {
+  display: block;
+}
+
+.footer-back {
+  font-family: var(--font-head);
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-back:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 6px;
 }
 
 .about-photo-panel {
