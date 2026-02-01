@@ -431,6 +431,8 @@ body.at-about .site-brand {
   padding: 0;
   color: var(--text-dark);
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
   scroll-margin-top: 10px;
 }
 
@@ -455,9 +457,10 @@ body.at-about .site-brand {
 .about-slide {
   flex: 0 0 100%;
   min-height: 100vh;
-  height: auto;
+  height: 100vh;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+  column-gap: 0;
   align-items: stretch;
   background: var(--pantone-8245c);
 }
@@ -506,14 +509,79 @@ body.at-about .site-brand {
   color: var(--text-dark);
 }
 
+.about-formats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.about-formats-heading {
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--text);
+}
+
+.about-formats-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.about-formats-list li {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  line-height: 1.7;
+  color: var(--text-dark);
+}
+
 .about-slide-image {
   display: flex;
   align-items: stretch;
-  background: #111;
+  justify-content: center;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--pantone-8245c);
 }
 
-.about-slide-image .about-photo-wrapper {
+.about-photo-stack {
+  width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.about-photo-slot {
+  width: 100%;
+  flex: 1;
+  border-radius: 0;
+  overflow: hidden;
+  position: relative;
+  background: transparent;
+  will-change: transform;
+  aspect-ratio: 16 / 9;
+}
+
+.about-photo-slot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 1400px) {
+  .about-slide {
+    grid-template-columns: minmax(0, 60%) minmax(0, 40%);
+  }
 }
 
 .about-actions {
@@ -524,6 +592,7 @@ body.at-about .site-brand {
   padding-top: clamp(0.5rem, 1.5vw, 1rem);
   display: flex;
   justify-content: center;
+  z-index: 2;
 }
 
 .about-controls {
@@ -690,34 +759,15 @@ body.at-about .site-brand {
   outline-offset: 6px;
 }
 
-.about-photo-panel {
-  width: 100%;
-  min-height: 100vh;
-  background: #111;
-  display: flex;
-  align-items: stretch;
-}
-
-.about-photo-wrapper {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #111;
-}
-
 .about-photo {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: center 90%;
+  object-position: center;
 }
 
 @media (max-width: 960px) {
-  .about-slide {
-    grid-template-columns: 1fr;
-  }
-
   .about-slide-image {
     min-height: 60vh;
   }
@@ -726,4 +776,96 @@ body.at-about .site-brand {
     position: static;
     padding: clamp(3rem, 5vw, 4rem);
   }
+}
+
+@media (max-width: 720px) {
+  .about-slide {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mockup-page {
+  background: #0b0b0b;
+  color: #fff;
+}
+
+.mockup-inner {
+  padding: clamp(4rem, 6vw, 6rem) clamp(1.5rem, 4vw, 3rem) clamp(5rem, 7vw, 7rem);
+}
+
+.mockup-header {
+  max-width: 620px;
+  margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+}
+
+.mockup-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mockup-title {
+  margin: 0.25rem 0;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.mockup-lead {
+  margin: 0;
+  max-width: 60ch;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mockup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(1.5rem, 2vw, 2.5rem);
+}
+
+.mockup-card {
+  background: #111;
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.mockup-photo {
+  width: 100%;
+  padding-top: 62%;
+  background-size: cover;
+  background-position: center;
+}
+
+.mockup-copy {
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mockup-meta {
+  margin: 0;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mockup-copy h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.mockup-copy p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
 }

@@ -45,6 +45,8 @@ let logoIntroTween = null;
 let enterTween = null;
 let aboutSlideTween = null;
 let aboutObserver = null;
+let entryRequested = false;
+let logoReadyForClick = false;
 
 const lockScroll = () => {
   if (!body) return;
@@ -234,6 +236,7 @@ const ensureLogoRow = ({ duration = 1.0, onComplete } = {}) => {
         logoWrap.style.height = "";
       });
       gsap.set(logoWrap, { autoAlpha: 1 });
+      logoReadyForClick = true;
       onComplete?.();
     },
   });
@@ -252,6 +255,7 @@ const forceLogoRowState = () => {
   logoWrap.style.width = "";
   logoWrap.style.height = "";
   gsap.set(logoWrap, { autoAlpha: 1, clearProps: "transform" });
+  logoReadyForClick = true;
 };
 
 let logoIntroPlayed = false;
@@ -311,12 +315,16 @@ const scrollToTarget = (target, offset = 0) => {
       : (target?.offsetTop ?? 0) + offset;
   gsap.to(window, {
     scrollTo: { y, autoKill: false },
-    duration: 1.1,
+    duration: 0.6,
     ease: "power2.out",
   });
 };
 
 const scrollToAbout = () => {
+  if (entered) {
+    scrollToTarget(aboutSection, 10);
+    return;
+  }
   enterSite({ scrollAfter: true, scrollTarget: aboutSection, scrollOffset: 10 });
 };
 
@@ -326,6 +334,8 @@ const enterSite = ({ scrollAfter = false, scrollTarget = null, scrollOffset = 0 
     return;
   }
   if (enterTween) return;
+  entryRequested = true;
+  enterTween = true;
 
   const startEnter = () => {
     const introIsActive =
@@ -353,7 +363,7 @@ const enterSite = ({ scrollAfter = false, scrollTarget = null, scrollOffset = 0 
         if (scrollAfter) {
           const target = scrollTarget || aboutSection;
           const offset = scrollOffset || 0;
-          gsap.delayedCall(0.1 * motionFactor, () => scrollToTarget(target, offset));
+          scrollToTarget(target, offset);
         }
       },
     });
@@ -449,7 +459,14 @@ const enterSite = ({ scrollAfter = false, scrollTarget = null, scrollOffset = 0 
     }
   };
 
-  ensureFontsReady().then(startEnter);
+  ensureFontsReady()
+    .then(startEnter)
+    .catch(() => {
+      if (enterTween === true) {
+        enterTween = null;
+      }
+      entryRequested = false;
+    });
 };
 
 // Initial state
@@ -494,17 +511,22 @@ window.addEventListener("load", queueLogoIntro, { once: true });
 setTimeout(queueLogoIntro, 900);
 
 // Enter interactions
-  logoButton?.addEventListener("click", () => {
-    enterSite();
-  });
+const triggerEntrance = () => {
+  if (!logoReadyForClick || entryRequested) return;
+  entryRequested = true;
+  enterSite();
+};
+logoButton?.addEventListener("click", () => {
+  triggerEntrance();
+});
 logoButton?.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
-    enterSite();
+    triggerEntrance();
   }
 });
 enterCta?.addEventListener("click", () => {
-  enterSite();
+  triggerEntrance();
 });
 
 // Scroll bumper
@@ -513,7 +535,7 @@ scrollBumper?.addEventListener("click", scrollToAbout);
 // Header about link
 aboutLink?.addEventListener("click", (event) => {
   event.preventDefault();
-  enterSite({ scrollAfter: true, scrollOffset: 10 });
+  scrollToAbout();
 });
 
 footerBackLink?.addEventListener("click", (event) => {
@@ -531,6 +553,7 @@ window.addEventListener("resize", () => {
 const aboutSlideTrack = document.querySelector(".about-slide-track");
 const aboutVariantButtons = Array.from(document.querySelectorAll(".about-variant-button"));
 const aboutBaseVariant = {
+  title: 'We are <span class="about-title-brand">Urbanoise</span>.',
   lead: "We believe that moving images hold a great potential to make architecture truly tangible.",
   paragraphs: [
     "URBANOISE is a production company founded by director/cinematographer Sufian Ararah and photographer and architect Rokas Jankus in 2026, dedicated to architectural documentaries in film and photography.",
@@ -539,12 +562,68 @@ const aboutBaseVariant = {
   ],
   image: "Photos/us2.JPG",
   alt: "Urbanoise founders portrait",
+  photoSlots: [
+    {
+      name: "default",
+      images: ["Photos/us2.JPG"],
+    },
+  ],
 };
 
-const aboutVariants = ["vision", "practice", "process", "culture"].map((key) => ({
-  key,
-  ...aboutBaseVariant,
-}));
+const visionPhotos = Array.from({ length: 11 }, (_, index) => `Photos/about/${index + 1}.jpg`);
+
+const aboutVisionVariant = {
+  title: 'We make <span class="about-title-brand">Films.</span>',
+  lead: "We make Films.",
+  paragraphs: [
+    "We work closely with our partners to capture and articulate the full picture behind a project — the approach, methods, and systems that shape a structure.",
+    "In dialogue with architects and design studios, we highlight the defining features of a design through considered cinematography, framing, and movement, while also taking into account the sonic qualities of space and material.",
+    "What we deliver is a coherent body of work that reflects the depth of effort behind an architectural project.",
+    "Our films aim to reveal the less obvious subtleties architecture is built upon — atmosphere, rhythm, use, and presence — rather than simply its appearance.",
+  ],
+  alt: "Urbanoise founders portrait",
+  photoSlots: [
+    {
+      name: "slot-1",
+      images: visionPhotos.slice(0, 3),
+      interval: 18000,
+      delay: 0,
+      duration: 1.2,
+    },
+    {
+      name: "slot-2",
+      images: visionPhotos.slice(3, 6),
+      interval: 19000,
+      delay: 5000,
+      duration: 1.25,
+    },
+    {
+      name: "slot-3",
+      images: visionPhotos.slice(6, 9),
+      interval: 20000,
+      delay: 10000,
+      duration: 1.3,
+    },
+    {
+      name: "slot-4",
+      images: visionPhotos.slice(9, 11),
+      interval: 22000,
+      delay: 15000,
+      duration: 1.35,
+    },
+  ],
+  formatsHeading: "Formats",
+  formats: [
+    "Long-form architectural films (7–12 min)",
+    "Short-form architectural documentary films (2.5–4.5 min)",
+    "Visual minutes, frames in motion, and audio-visual edits designed for social media representation",
+  ],
+};
+
+const aboutVariants = [
+  { key: "vision", ...aboutVisionVariant },
+  ...["practice", "process", "culture"].map((key) => ({ key, ...aboutBaseVariant })),
+];
 
 const updateVariantButtons = (activeKey) => {
   aboutVariantButtons.forEach((button) => {
@@ -581,33 +660,140 @@ const setAboutVariant = (index, { animate = true } = {}) => {
 const createSlide = (variant) => {
   const slide = document.createElement("article");
   slide.className = "about-slide";
+  slide.dataset.variantKey = variant.key;
   const paragraphs = variant.paragraphs
     .map((paragraph) => `<p class="about-paragraph">${paragraph}</p>`)
     .join("");
+  const formatsList = variant.formats
+    ? `
+        <div class="about-formats">
+          <p class="about-paragraph about-formats-heading">${variant.formatsHeading ?? "Formats"}</p>
+          <ul class="about-formats-list">
+            ${variant.formats.map((format) => `<li>${format}</li>`).join("")}
+          </ul>
+        </div>
+      `
+    : "";
+  const titleMarkup = variant.title ?? 'We are <span class="about-title-brand">Urbanoise</span>.';
+  const photoSlots = variant.photoSlots ?? (variant.images ? variant.images.map((image, index) => ({
+    name: `slot-${index}`,
+    images: [image],
+  })) : []);
+  const slotsMarkup = photoSlots
+    .map((slotConfig, index) => {
+      const slotImages = (Array.isArray(slotConfig.images) ? slotConfig.images : []).filter(Boolean);
+      if (!slotImages.length) return "";
+      const attrs = [
+        `data-slot="${slotConfig.name ?? index}"`,
+        `data-images='${JSON.stringify(slotImages)}'`,
+        `data-interval="${slotConfig.interval ?? 5000}"`,
+        `data-duration="${slotConfig.duration ?? 0.9}"`,
+        `data-delay="${slotConfig.delay ?? 0}"`,
+      ].join(" ");
+      return `
+        <div class="about-photo-slot" ${attrs}>
+          <img class="about-photo" src="${slotImages[0]}" alt="${variant.alt ?? ""}" loading="lazy" />
+        </div>
+      `;
+    })
+    .join("");
+  const imageStack = slotsMarkup
+    ? `
+        <div class="about-slide-image">
+          <div class="about-photo-stack">
+            ${slotsMarkup}
+          </div>
+        </div>
+      `
+    : "";
   slide.innerHTML = `
     <div class="about-slide-text">
-      <p class="about-eyebrow">About</p>
-      <h2 class="about-title">
-        We are <span class="about-title-brand">Urbanoise</span>.
-      </h2>
+      <h2 class="about-title">${titleMarkup}</h2>
       <p class="about-lead">${variant.lead}</p>
       <div class="about-copy">
         ${paragraphs}
       </div>
+      ${formatsList}
     </div>
-    <div class="about-slide-image">
-      <div class="about-photo-wrapper">
-        <img class="about-photo" src="${variant.image}" alt="${variant.alt}" loading="lazy" />
-      </div>
-    </div>
+    ${imageStack}
   `;
   return slide;
+};
+
+const photoSlotTimers = new WeakMap();
+
+const clearPhotoSlotRotation = (slotEl) => {
+  const timers = photoSlotTimers.get(slotEl);
+  if (!timers) return;
+  if (timers.intervalId) clearInterval(timers.intervalId);
+  if (timers.timeoutId) clearTimeout(timers.timeoutId);
+  photoSlotTimers.delete(slotEl);
+};
+
+const setupPhotoSlotRotation = (slotEl) => {
+  clearPhotoSlotRotation(slotEl);
+  const rawImages = slotEl.dataset.images;
+  if (!rawImages) return;
+  let images;
+  try {
+    images = JSON.parse(rawImages);
+  } catch (error) {
+    return;
+  }
+  if (!images || images.length < 2) return;
+
+  const interval = Number(slotEl.dataset.interval) || 5000;
+  const duration = Number(slotEl.dataset.duration) || 0.9;
+  const delay = Number(slotEl.dataset.delay) || 0;
+  const img = slotEl.querySelector("img");
+  let currentIndex = 0;
+  slotEl.dataset.busy = "false";
+  if (img) {
+    gsap.set(img, { yPercent: 0 });
+  }
+
+  const animateNextImage = () => {
+    const nextIndex = (currentIndex + 1) % images.length;
+    if (!img || slotEl.dataset.busy === "true") return;
+    slotEl.dataset.busy = "true";
+    const timeline = gsap.timeline({ defaults: { ease: "power2.inOut" } });
+    timeline
+      .to(img, { xPercent: -100, duration: duration / 2 })
+      .add(() => {
+        img.src = images[nextIndex];
+        gsap.set(img, { xPercent: 100 });
+      })
+      .to(img, { xPercent: 0, duration: duration / 2 })
+      .add(() => {
+        slotEl.dataset.busy = "false";
+      });
+    currentIndex = nextIndex;
+  };
+
+  const startRotation = () => {
+    const initialDelay = delay > 0 ? delay : interval;
+    const timeoutId = setTimeout(() => {
+      animateNextImage();
+      const intervalId = setInterval(animateNextImage, interval);
+      photoSlotTimers.set(slotEl, { intervalId, timeoutId: null });
+    }, initialDelay);
+    photoSlotTimers.set(slotEl, { intervalId: null, timeoutId });
+  };
+
+  startRotation();
+};
+
+const initPhotoSlotRotations = () => {
+  document.querySelectorAll(".about-photo-slot").forEach((slot) => {
+    setupPhotoSlotRotation(slot);
+  });
 };
 
 if (aboutSlideTrack) {
   aboutVariants.forEach((variant) => {
     aboutSlideTrack.appendChild(createSlide(variant));
   });
+  initPhotoSlotRotations();
 }
 if (aboutVariantButtons.length) {
   aboutVariantButtons.forEach((button) => {
