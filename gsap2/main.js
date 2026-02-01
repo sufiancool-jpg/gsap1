@@ -33,6 +33,7 @@ const scrollBumper = document.querySelector(".scroll-bumper");
 const aboutSection = document.querySelector("#about");
 const aboutLink = document.querySelector('a[href="#about"]');
 const footerBackLink = document.querySelector('a[href="#stage"]');
+const mockupSection = document.querySelector("#mockup");
 
 const LOCK_CLASS = "scroll-locked";
 const ENTERED_CLASS = "is-entered";
@@ -45,6 +46,7 @@ let logoIntroTween = null;
 let enterTween = null;
 let aboutSlideTween = null;
 let aboutObserver = null;
+let mockupObserver = null;
 let entryRequested = false;
 let logoReadyForClick = false;
 
@@ -98,6 +100,10 @@ const setAtAbout = (on) => {
   });
 };
 
+const setAtMockup = (on) => {
+  body?.classList.toggle("at-mockup", Boolean(on));
+};
+
 const initAboutObserver = () => {
   if (!aboutSection || !("IntersectionObserver" in window)) return;
   aboutObserver?.disconnect();
@@ -115,6 +121,25 @@ const initAboutObserver = () => {
     }
   );
   aboutObserver.observe(aboutSection);
+};
+
+const initMockupObserver = () => {
+  if (!mockupSection || !("IntersectionObserver" in window)) return;
+  mockupObserver?.disconnect();
+  mockupObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.target !== mockupSection) return;
+        setAtMockup(entry.isIntersecting);
+      });
+    },
+    {
+      root: null,
+      rootMargin: "-35% 0px -55% 0px",
+      threshold: 0.01,
+    }
+  );
+  mockupObserver.observe(mockupSection);
 };
 
 const hideBumperNow = () => {
@@ -499,6 +524,7 @@ if (video && fallback) {
 
 ensureFontsReady().then(() => computeLogoTarget());
 initAboutObserver();
+initMockupObserver();
 
 // Logo intro + CTA reveal
 const queueLogoIntro = () => {
@@ -554,9 +580,9 @@ const aboutSlideTrack = document.querySelector(".about-slide-track");
 const aboutVariantButtons = Array.from(document.querySelectorAll(".about-variant-button"));
 const aboutBaseVariant = {
   title: 'We are <span class="about-title-brand">Urbanoise</span>.',
-  lead: "We believe that moving images hold a great potential to make architecture truly tangible.",
+  lead: "Narrative-driven work with a cinematic backbone.",
   paragraphs: [
-    "URBANOISE is a production company founded by director/cinematographer Sufian Ararah and photographer and architect Rokas Jankus in 2026, dedicated to architectural documentaries in film and photography.",
+    "URBANOISE is a production company founded by director/cinematographer <span class=\"about-highlight\">Sufian Ararah</span> and photographer and architect <span class=\"about-highlight\">Rokas Jankus</span> in 2025, dedicated to architectural documentaries in film and photography.",
     "At the core of our practice lies observation rather than staging. We document processes, uses, transitions and atmospheres as they unfold, allowing architecture to be understood within its real context.",
     "URBANOISE stands for a documentary and artistic engagement with architecture and urban space. Works that aim not at attention, but at understanding.",
   ],
@@ -620,9 +646,95 @@ const aboutVisionVariant = {
   ],
 };
 
+const aboutPhotographyVariant = {
+  primaryTitle: 'We make <span class="about-title-highlight">Photographs</span>.',
+  lead:
+    "Photography complements our <span class=\"about-highlight\">films where concentration, precision and reduction are required.</span>",
+  paragraphs: [
+    "Photography complements our films where concentration, precision, and reduction are required.",
+    "It allows us to isolate space, material, and detail — moments where stillness reveals structure more clearly than movement.",
+    "Our photographic work focuses on clarity and intent rather than decoration.",
+    "Through careful framing, light, and timing, we document architecture and environments with attention to proportion, texture, and atmosphere, creating images that communicate rather than embellish.",
+  ],
+  alt: "Urbanoise founders portrait",
+  photoCarousel: {
+    images: [
+      "Photos/Architektur_1.jpg",
+      "Photos/Architektur_2.jpg",
+      "Photos/Architektur_3.jpg",
+      "Photos/Architektur_4.jpg",
+      "Photos/Architektur_5.jpg",
+      "Photos/Architektur_6.jpg",
+      "Photos/Architektur_7.jpg",
+      "Photos/Architektur_8.jpg",
+      "Photos/Architektur_9.jpg",
+    ],
+    interval: 16000,
+    duration: 0.6,
+    delay: 0,
+  },
+  formatsHeading: "Formats",
+  formats: [
+    "Architectural photography",
+    "Editorial & documentary photography",
+    "Detail and material studies",
+    "Series and visual sets for publications, exhibitions, and digital platforms",
+  ],
+};
+
+const aboutConsultationsVariant = {
+  primaryTitle: 'We make <span class="about-title-highlight">campaigns.</span>',
+  lead:
+    "We work with partners to define clear media strategies rooted in purpose rather than noise.",
+  paragraphs: [
+    "Our consultation work focuses on shaping clear, purpose-driven media campaigns — defining structure, visual language, and distribution as one coherent system.",
+    "In addition, we offer workshops and seminars in filmmaking and photography for firms, institutions, and organizations interested in documenting their own work with clarity and consistency.",
+  ],
+  alt: "Urbanoise founders portrait",
+  photoSlots: [
+    {
+      name: "slot-1",
+      images: visionPhotos.slice(0, 3),
+      interval: 20000,
+      delay: 0,
+      duration: 0.6,
+    },
+    {
+      name: "slot-2",
+      images: visionPhotos.slice(3, 6),
+      interval: 21000,
+      delay: 5000,
+      duration: 0.65,
+    },
+    {
+      name: "slot-3",
+      images: visionPhotos.slice(6, 9),
+      interval: 22000,
+      delay: 10000,
+      duration: 0.7,
+    },
+    {
+      name: "slot-4",
+      images: visionPhotos.slice(9, 11),
+      interval: 23000,
+      delay: 15000,
+      duration: 0.75,
+    },
+  ],
+  formatsHeading: "Formats",
+  formats: [
+    "Media & campaign strategy",
+    "Narrative and content structure",
+    "Visual language & direction",
+    "Platform and distribution guidance",
+  ],
+};
+
 const aboutVariants = [
   { key: "vision", ...aboutVisionVariant },
-  ...["practice", "process", "culture"].map((key) => ({ key, ...aboutBaseVariant })),
+  { key: "practice", ...aboutPhotographyVariant },
+  { key: "process", ...aboutConsultationsVariant },
+  ...["culture"].map((key) => ({ key, ...aboutBaseVariant })),
 ];
 
 const updateVariantButtons = (activeKey) => {
@@ -674,7 +786,11 @@ const createSlide = (variant) => {
         </div>
       `
     : "";
-  const titleMarkup = variant.title ?? 'We are <span class="about-title-brand">Urbanoise</span>.';
+  const titleMarkup =
+    variant.primaryTitle ?? variant.title ?? 'We are <span class="about-title-brand">Urbanoise</span>.';
+  const secondaryTitleMarkup = variant.secondaryTitle
+    ? `<p class="about-secondary-title">${variant.secondaryTitle}</p>`
+    : "";
   const photoSlots = variant.photoSlots ?? (variant.images ? variant.images.map((image, index) => ({
     name: `slot-${index}`,
     images: [image],
@@ -697,7 +813,7 @@ const createSlide = (variant) => {
       `;
     })
     .join("");
-  const imageStack = slotsMarkup
+  const stackMarkup = slotsMarkup
     ? `
         <div class="about-slide-image">
           <div class="about-photo-stack">
@@ -706,9 +822,28 @@ const createSlide = (variant) => {
         </div>
       `
     : "";
+  const carousel = variant.photoCarousel;
+  const carouselMarkup =
+    carousel && carousel.images?.length
+      ? `
+        <div class="about-slide-image">
+          <div
+            class="about-photo-carousel"
+            data-images='${JSON.stringify(carousel.images)}'
+            data-interval="${carousel.interval ?? 8000}"
+            data-duration="${carousel.duration ?? 0.6}"
+            data-delay="${carousel.delay ?? 0}"
+          >
+            <img class="about-photo" src="${carousel.images[0]}" alt="${variant.alt ?? ""}" loading="lazy" />
+          </div>
+        </div>
+      `
+      : "";
+  const imageStack = carouselMarkup || stackMarkup;
   slide.innerHTML = `
     <div class="about-slide-text">
       <h2 class="about-title">${titleMarkup}</h2>
+      ${secondaryTitleMarkup}
       <p class="about-lead">${variant.lead}</p>
       <div class="about-copy">
         ${paragraphs}
@@ -783,9 +918,64 @@ const setupPhotoSlotRotation = (slotEl) => {
   startRotation();
 };
 
+const setupPhotoCarousel = (carouselEl) => {
+  const rawImages = carouselEl.dataset.images;
+  if (!rawImages) return;
+  let images;
+  try {
+    images = JSON.parse(rawImages);
+  } catch (error) {
+    return;
+  }
+  if (!images || images.length < 2) return;
+
+  const interval = Number(carouselEl.dataset.interval) || 8000;
+  const duration = Number(carouselEl.dataset.duration) || 0.6;
+  const delay = Number(carouselEl.dataset.delay) || 0;
+  const img = carouselEl.querySelector("img");
+  let currentIndex = 0;
+  carouselEl.dataset.busy = "false";
+
+  const animate = () => {
+    const nextIndex = (currentIndex + 1) % images.length;
+    if (!img || carouselEl.dataset.busy === "true") return;
+    carouselEl.dataset.busy = "true";
+    const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
+    tl
+      .to(img, { xPercent: -100, duration: duration / 2 })
+      .add(() => {
+        img.src = images[nextIndex];
+        gsap.set(img, { xPercent: 100 });
+      })
+      .to(img, { xPercent: 0, duration: duration / 2 })
+      .add(() => {
+        carouselEl.dataset.busy = "false";
+      });
+    currentIndex = nextIndex;
+  };
+
+  const start = () => {
+    const initialDelay = delay > 0 ? delay : interval;
+    const timeoutId = setTimeout(() => {
+      animate();
+      const intervalId = setInterval(animate, interval);
+      photoSlotTimers.set(carouselEl, { intervalId, timeoutId: null });
+    }, initialDelay);
+    photoSlotTimers.set(carouselEl, { intervalId: null, timeoutId });
+  };
+
+  start();
+};
+
 const initPhotoSlotRotations = () => {
   document.querySelectorAll(".about-photo-slot").forEach((slot) => {
     setupPhotoSlotRotation(slot);
+  });
+};
+
+const initPhotoCarousels = () => {
+  document.querySelectorAll(".about-photo-carousel").forEach((carousel) => {
+    setupPhotoCarousel(carousel);
   });
 };
 
@@ -794,6 +984,7 @@ if (aboutSlideTrack) {
     aboutSlideTrack.appendChild(createSlide(variant));
   });
   initPhotoSlotRotations();
+  initPhotoCarousels();
 }
 if (aboutVariantButtons.length) {
   aboutVariantButtons.forEach((button) => {

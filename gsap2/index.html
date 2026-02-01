@@ -122,13 +122,13 @@
                 FILMS
               </button>
               <button type="button" class="about-variant-button" data-variant="practice" aria-pressed="false">
-                Practice
+                Photography
               </button>
               <button type="button" class="about-variant-button" data-variant="process" aria-pressed="false">
-                Process
+                Consultations
               </button>
               <button type="button" class="about-variant-button" data-variant="culture" aria-pressed="false">
-                Culture
+                About us
               </button>
             </div>
           </div>
@@ -175,12 +175,42 @@
 
       <section class="footer-page" id="contact" aria-label="Get in touch">
         <div class="footer-inner">
-          <h2 class="footer-title">
-            <span>Get</span>
-            <span>In</span>
-            <span>Touch</span>
-          </h2>
-          <a class="footer-back" href="#stage">Back to main page</a>
+          <div class="footer-newsletter">
+            <p class="footer-lead">
+              Sign up to receive updates on new work, behind-the-scenes notes, and screenings.
+            </p>
+            <form class="footer-newsletter-form">
+              <label class="sr-only" for="newsletter-email">Email address</label>
+              <div class="footer-newsletter-field">
+                <input
+                  id="newsletter-email"
+                  name="email"
+                  type="email"
+                  placeholder="Email address"
+                  required
+                  autocomplete="email"
+                />
+                <button type="submit">Subscribe</button>
+              </div>
+            </form>
+          </div>
+          <div class="footer-meta">
+            <div class="footer-social" aria-label="Urbanoise social links">
+              <a class="footer-social-link" href="https://www.instagram.com" target="_blank" rel="noreferrer noopener" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" role="img">
+                  <path d="M17 2H7C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5zm3 15c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3h10c1.7 0 3 1.3 3 3v10z" />
+                  <path d="M12 7.3A4.7 4.7 0 1 0 16.7 12 4.7 4.7 0 0 0 12 7.3zm0 7.6A2.9 2.9 0 1 1 14.9 12 2.9 2.9 0 0 1 12 14.9zM17.9 6.4a1.1 1.1 0 1 1-1.1-1.1 1.1 1.1 0 0 1 1.1 1.1z" />
+                </svg>
+              </a>
+              <a class="footer-social-link" href="https://www.linkedin.com" target="_blank" rel="noreferrer noopener" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" role="img">
+                  <path d="M4.5 9h3v12h-3zM6 4.5a1.75 1.75 0 1 1-1.75 1.75A1.75 1.75 0 0 1 6 4.5zM9 9h2.8v1.7h.1a3.08 3.08 0 0 1 2.8-1.6c3 0 3.5 2 3.5 4.6V21h-3v-5.1c0-1.3 0-3-1.8-3s-2 1.4-2 2.9V21H9z" />
+                </svg>
+              </a>
+            </div>
+            <a class="footer-back" href="#stage">Back to main page</a>
+            <p class="footer-note">Urbanoise © 2025 Imprint</p>
+          </div>
         </div>
       </section>
     </main>
