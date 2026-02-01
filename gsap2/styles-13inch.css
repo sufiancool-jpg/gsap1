@@ -1,11 +1,38 @@
-/* 13-inch laptop height tuning (1440px wide). */
-
-.about-left {
-  padding-top: 3.6rem;
-  padding-bottom: 2.6rem;
+/* 13-inch laptop height tuning (1440px wide) */
+.about-slide {
+  min-height: 90vh;
 }
 
-.about-statement {
-  margin-top: 3.1rem;
+.about-slide-text {
+  padding: clamp(2.6rem, 3vw, 3.4rem) clamp(1.2rem, 2.5vw, 2.6rem) clamp(3.8rem, 5vh, 4.5rem)
+    clamp(1.2rem, 1.8vw, 2rem);
+}
+
+.about-title {
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+
+.about-lead {
+  font-size: clamp(1rem, 2.4vw, 1.4rem);
+}
+
+.about-paragraph {
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+}
+
+.about-actions {
+  bottom: clamp(2rem, 3vw, 3.5rem);
+}
+
+.about-photo-stack {
+  gap: 0;
+}
+
+.about-photo-slot {
+  aspect-ratio: 16 / 9;
+}
+
+.about-photo-stack .about-photo-slot:nth-of-type(4) {
+  display: none;
 }
 
