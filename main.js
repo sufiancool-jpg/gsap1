@@ -1054,17 +1054,6 @@ if (pillarsSection && pillarsRail) {
     setP23Frame(frame);
     p23Idx = (p23Idx + 1) % p23Frames.length;
   };
-  const loadP23Frames = async () => {
-    try {
-      const res = await fetch("Photos/nyc/manifest.json", { cache: "no-store" });
-      if (!res.ok) return;
-      const data = await res.json();
-      const frames = Array.isArray(data) ? data : Array.isArray(data.frames) ? data.frames : [];
-      applyP23Frames(frames);
-    } catch (_err) {
-      // Fallback to default list if manifest is missing or blocked.
-    }
-  };
   const startP23 = (interval = p23DefaultInterval) => {
     if (!p23Window) return;
     if (prefersReducedMotion) {
@@ -1085,7 +1074,6 @@ if (pillarsSection && pillarsRail) {
 
   if (p23Window && p23Wrap) {
     if (p23Frames.length) setP23Frame(p23Frames[0]);
-    loadP23Frames();
     p23Window.addEventListener("mouseenter", () => {
       p23HoverExpand = true;
       cacheP23Base();
